@@ -2,27 +2,25 @@ using System.Text.RegularExpressions;
 
 namespace Domain.Model
 {
-    public class Paseador
+    public class Dueno
     {
         public int Id { get; private set; }
         public string Nombre { get; private set; }
         public string Apellido { get; private set; }
         public string Email { get; private set; }
         public string Telefono { get; private set; }
-        public string Zona { get; private set; }
-        public decimal TarifaPorHora { get; private set; }
+        public string Direccion { get; private set; }
         public DateTime FechaAlta { get; private set; }
 
-        public Paseador(int id, string nombre, string apellido, string email,
-                        string telefono, string zona, decimal tarifaPorHora, DateTime fechaAlta)
+        public Dueno(int id, string nombre, string apellido, string email,
+                     string telefono, string direccion, DateTime fechaAlta)
         {
             SetId(id);
             SetNombre(nombre);
             SetApellido(apellido);
             SetEmail(email);
             SetTelefono(telefono);
-            SetZona(zona);
-            SetTarifaPorHora(tarifaPorHora);
+            SetDireccion(direccion);
             SetFechaAlta(fechaAlta);
         }
 
@@ -68,18 +66,11 @@ namespace Domain.Model
             Telefono = telefono.Trim();
         }
 
-        public void SetZona(string zona)
+        public void SetDireccion(string direccion)
         {
-            if (string.IsNullOrWhiteSpace(zona))
-                throw new ArgumentException("La zona no puede ser nula o vacía.", nameof(zona));
-            Zona = zona.Trim();
-        }
-
-        public void SetTarifaPorHora(decimal tarifaPorHora)
-        {
-            if (tarifaPorHora <= 0)
-                throw new ArgumentException("La tarifa por hora debe ser mayor que 0.", nameof(tarifaPorHora));
-            TarifaPorHora = tarifaPorHora;
+            if (string.IsNullOrWhiteSpace(direccion))
+                throw new ArgumentException("La dirección no puede ser nula o vacía.", nameof(direccion));
+            Direccion = direccion.Trim();
         }
 
         public void SetFechaAlta(DateTime fechaAlta)

@@ -1,11 +1,20 @@
+using WebAPI;
+using Application.Services;
+using Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Inyección de dependencias - Paseador
+builder.Services.AddScoped<IPaseadorRepository, PaseadorRepository>();
+builder.Services.AddScoped<IPaseadorService, PaseadorService>();
+
+// Inyección de dependencias - Dueño
+builder.Services.AddScoped<IDuenoRepository, DuenoRepository>();
+builder.Services.AddScoped<IDuenoService, DuenoService>();
 
 var app = builder.Build();
 
@@ -16,10 +25,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseAuthorization();
-
-app.MapControllers();
+// Mapeo de endpoints
+app.MapPaseadorEndpoints();
+app.MapDuenoEndpoints();
 
 app.Run();
