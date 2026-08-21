@@ -19,7 +19,14 @@ namespace Paseadores.WinForms
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            
+
+        }
+
+        private void paseadoresToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormPaseadores ventanaPaseadores = new FormPaseadores();
+            ventanaPaseadores.MdiParent = this;
+            ventanaPaseadores.Show();
         }
     }
 }
