@@ -15,7 +15,7 @@ namespace Paseadores.WinForms
     public partial class FormPaseadores : Form
     {
         private static readonly HttpClient client = new HttpClient();
-
+        private int idPaseadorSeleccionado = 0;
 
         private readonly string urlApi = "https://localhost:7140/paseadores";
         public FormPaseadores()
@@ -48,6 +48,7 @@ namespace Paseadores.WinForms
         {
             var nuevoPaseador = new PaseadorDTO
             {
+                Id = idPaseadorSeleccionado,
                 Nombre = txtNombre.Text,
                 Apellido = txtApellido.Text,
                 Telefono = txtTelefono.Text,
@@ -58,7 +59,16 @@ namespace Paseadores.WinForms
 
             try
             {
-                HttpResponseMessage response = await client.PostAsJsonAsync(urlApi, nuevoPaseador);
+                HttpResponseMessage response;
+
+                if(idPaseadorSeleccionado == 0)
+                {
+                    response = await client.PostAsJsonAsync(urlApi, nuevoPaseador);
+                }
+                else
+                {
+                    response = await client.PutAsJsonAsync(urlApi, nuevoPaseador);
+                }
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -70,7 +80,8 @@ namespace Paseadores.WinForms
                     txtTelefono.Clear();
                     txtTarifa.Clear();
                     txtZona.Clear();
-
+                    idPaseadorSeleccionado = 0;
+                    dgvPaseadores.ClearSelection();
                     await CargarPaseadoresAsync();
                 }
                 else
@@ -95,6 +106,8 @@ namespace Paseadores.WinForms
             txtTarifa.Clear();
             txtZona.Clear();
             txtNombre.Focus();
+            idPaseadorSeleccionado = 0;
+            dgvPaseadores.ClearSelection();
         }
 
         private async void btnEliminar_Click(object sender, EventArgs e)
@@ -128,6 +141,20 @@ namespace Paseadores.WinForms
                     MessageBox.Show("Hubo un error al intentar conectar:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void dgvPaseadores_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvPaseadores.Rows[e.RowIndex];
+
+            idPaseadorSeleccionado = Convert.ToInt32(fila.Cells["colId"].Value);
+            txtNombre.Text = fila.Cells["colNombre"].Value?.ToString();
+            txtApellido.Text = fila.Cells["colApellido"].Value?.ToString();
+            txtEmail.Text = fila.Cells["colEmail"].Value?.ToString();
+            txtTelefono.Text = fila.Cells["colTelefono"].Value?.ToString();
+            txtTarifa.Text = fila.Cells["colTarifa"].Value?.ToString();
+            txtZona.Text = fila.Cells["colZona"].Value?.ToString();
         }
     }
 }

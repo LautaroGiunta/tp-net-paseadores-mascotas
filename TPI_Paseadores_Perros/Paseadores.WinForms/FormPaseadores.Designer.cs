@@ -29,13 +29,6 @@
         private void InitializeComponent()
         {
             dgvPaseadores = new DataGridView();
-            colId = new DataGridViewTextBoxColumn();
-            colNombre = new DataGridViewTextBoxColumn();
-            colApelldio = new DataGridViewTextBoxColumn();
-            colEmail = new DataGridViewTextBoxColumn();
-            colTelefono = new DataGridViewTextBoxColumn();
-            colTarifa = new DataGridViewTextBoxColumn();
-            colZona = new DataGridViewTextBoxColumn();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
@@ -51,6 +44,13 @@
             btnLimpiar = new Button();
             label6 = new Label();
             txtZona = new TextBox();
+            colId = new DataGridViewTextBoxColumn();
+            colNombre = new DataGridViewTextBoxColumn();
+            colApellido = new DataGridViewTextBoxColumn();
+            colEmail = new DataGridViewTextBoxColumn();
+            colTelefono = new DataGridViewTextBoxColumn();
+            colTarifa = new DataGridViewTextBoxColumn();
+            colZona = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvPaseadores).BeginInit();
             SuspendLayout();
             // 
@@ -61,69 +61,14 @@
             dgvPaseadores.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvPaseadores.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvPaseadores.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvPaseadores.Columns.AddRange(new DataGridViewColumn[] { colId, colNombre, colApelldio, colEmail, colTelefono, colTarifa, colZona });
+            dgvPaseadores.Columns.AddRange(new DataGridViewColumn[] { colId, colNombre, colApellido, colEmail, colTelefono, colTarifa, colZona });
             dgvPaseadores.Location = new Point(355, 3);
             dgvPaseadores.Name = "dgvPaseadores";
             dgvPaseadores.ReadOnly = true;
             dgvPaseadores.RowHeadersWidth = 51;
             dgvPaseadores.Size = new Size(447, 445);
             dgvPaseadores.TabIndex = 9;
-            // 
-            // colId
-            // 
-            colId.DataPropertyName = "Id";
-            colId.HeaderText = "ID";
-            colId.MinimumWidth = 6;
-            colId.Name = "colId";
-            colId.ReadOnly = true;
-            // 
-            // colNombre
-            // 
-            colNombre.DataPropertyName = "Nombre";
-            colNombre.HeaderText = "Nombre";
-            colNombre.MinimumWidth = 6;
-            colNombre.Name = "colNombre";
-            colNombre.ReadOnly = true;
-            // 
-            // colApelldio
-            // 
-            colApelldio.DataPropertyName = "Apellido";
-            colApelldio.HeaderText = "Apellido";
-            colApelldio.MinimumWidth = 6;
-            colApelldio.Name = "colApelldio";
-            colApelldio.ReadOnly = true;
-            // 
-            // colEmail
-            // 
-            colEmail.DataPropertyName = "Email";
-            colEmail.HeaderText = "Email";
-            colEmail.MinimumWidth = 6;
-            colEmail.Name = "colEmail";
-            colEmail.ReadOnly = true;
-            // 
-            // colTelefono
-            // 
-            colTelefono.DataPropertyName = "Telefono";
-            colTelefono.HeaderText = "Telefono";
-            colTelefono.MinimumWidth = 6;
-            colTelefono.Name = "colTelefono";
-            colTelefono.ReadOnly = true;
-            // 
-            // colTarifa
-            // 
-            colTarifa.DataPropertyName = "TarifaPorHora";
-            colTarifa.HeaderText = "Tarifa";
-            colTarifa.MinimumWidth = 6;
-            colTarifa.Name = "colTarifa";
-            colTarifa.ReadOnly = true;
-            // 
-            // colZona
-            // 
-            colZona.DataPropertyName = "Zona";
-            colZona.HeaderText = "Zona";
-            colZona.MinimumWidth = 6;
-            colZona.Name = "colZona";
-            colZona.ReadOnly = true;
+            dgvPaseadores.CellDoubleClick += dgvPaseadores_CellDoubleClick;
             // 
             // label1
             // 
@@ -257,6 +202,62 @@
             txtZona.Size = new Size(328, 27);
             txtZona.TabIndex = 5;
             // 
+            // colId
+            // 
+            colId.DataPropertyName = "Id";
+            colId.HeaderText = "ID";
+            colId.MinimumWidth = 6;
+            colId.Name = "colId";
+            colId.ReadOnly = true;
+            // 
+            // colNombre
+            // 
+            colNombre.DataPropertyName = "Nombre";
+            colNombre.HeaderText = "Nombre";
+            colNombre.MinimumWidth = 6;
+            colNombre.Name = "colNombre";
+            colNombre.ReadOnly = true;
+            // 
+            // colApellido
+            // 
+            colApellido.DataPropertyName = "Apellido";
+            colApellido.HeaderText = "Apellido";
+            colApellido.MinimumWidth = 6;
+            colApellido.Name = "colApellido";
+            colApellido.ReadOnly = true;
+            // 
+            // colEmail
+            // 
+            colEmail.DataPropertyName = "Email";
+            colEmail.HeaderText = "Email";
+            colEmail.MinimumWidth = 6;
+            colEmail.Name = "colEmail";
+            colEmail.ReadOnly = true;
+            // 
+            // colTelefono
+            // 
+            colTelefono.DataPropertyName = "Telefono";
+            colTelefono.HeaderText = "Telefono";
+            colTelefono.MinimumWidth = 6;
+            colTelefono.Name = "colTelefono";
+            colTelefono.ReadOnly = true;
+            // 
+            // colTarifa
+            // 
+            colTarifa.DataPropertyName = "TarifaPorHora";
+            colTarifa.HeaderText = "Tarifa";
+            colTarifa.MinimumWidth = 6;
+            colTarifa.Name = "colTarifa";
+            colTarifa.ReadOnly = true;
+            // 
+            // colZona
+            // 
+            colZona.DataPropertyName = "Zona";
+            colZona.HeaderText = "Zona";
+            colZona.MinimumWidth = 6;
+            colZona.Name = "colZona";
+            colZona.ReadOnly = true;
+            // 
             // FormPaseadores
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -307,7 +308,7 @@
         private TextBox txtZona;
         private DataGridViewTextBoxColumn colId;
         private DataGridViewTextBoxColumn colNombre;
-        private DataGridViewTextBoxColumn colApelldio;
+        private DataGridViewTextBoxColumn colApellido;
         private DataGridViewTextBoxColumn colEmail;
         private DataGridViewTextBoxColumn colTelefono;
         private DataGridViewTextBoxColumn colTarifa;
