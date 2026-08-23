@@ -58,13 +58,13 @@
             // cerrarSesiónToolStripMenuItem
             // 
             cerrarSesiónToolStripMenuItem.Name = "cerrarSesiónToolStripMenuItem";
-            cerrarSesiónToolStripMenuItem.Size = new Size(224, 26);
+            cerrarSesiónToolStripMenuItem.Size = new Size(179, 26);
             cerrarSesiónToolStripMenuItem.Text = "Cerrar Sesión";
             // 
             // salirToolStripMenuItem
             // 
             salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            salirToolStripMenuItem.Size = new Size(224, 26);
+            salirToolStripMenuItem.Size = new Size(179, 26);
             salirToolStripMenuItem.Text = "Salir";
             // 
             // gestionToolStripMenuItem
@@ -86,6 +86,7 @@
             dueñosToolStripMenuItem.Name = "dueñosToolStripMenuItem";
             dueñosToolStripMenuItem.Size = new Size(224, 26);
             dueñosToolStripMenuItem.Text = "Dueños";
+            dueñosToolStripMenuItem.Click += dueñosToolStripMenuItem_Click;
             // 
             // FormMain
             // 

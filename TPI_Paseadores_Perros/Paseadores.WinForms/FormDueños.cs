@@ -1,40 +1,39 @@
-﻿using System;
+﻿using DTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DTOs;
-using System.Net.Http.Json;
 
 namespace Paseadores.WinForms
 {
-    public partial class FormPaseadores : Form
+    public partial class FormDueños : Form
     {
         private static readonly HttpClient client = new HttpClient();
-        private int idPaseadorSeleccionado = 0;
-
-        private readonly string urlApi = "https://localhost:7140/paseadores";
-        public FormPaseadores()
+        int idDueñoSeleccionado = 0;
+        private readonly string urlApi = "https://localhost:7140/duenos";
+        public FormDueños()
         {
             InitializeComponent();
         }
 
-        private async void FormPaseadores_Load(object sender, EventArgs e)
+        private async void FormDueños_Load(object sender, EventArgs e)
         {
-            dgvPaseadores.AutoGenerateColumns = false;
-            await CargarPaseadoresAsync();
+            dgvDueños.AutoGenerateColumns = false;
+            await CargarDueñosAsync();
         }
 
-        private async Task CargarPaseadoresAsync()
+        private async Task CargarDueñosAsync()
         {
             try
             {
-                List<PaseadorDTO> lista = await client.GetFromJsonAsync<List<PaseadorDTO>>(urlApi);
-                dgvPaseadores.DataSource = lista;
+                List<DuenoDTO> lista = await client.GetFromJsonAsync<List<DuenoDTO>>(urlApi);
+                dgvDueños.DataSource = lista;
 
             }
             catch (Exception ex)
@@ -44,32 +43,29 @@ namespace Paseadores.WinForms
             }
         }
 
+
         private async void btnGuardar_Click(object sender, EventArgs e)
         {
-            var nuevoPaseador = new PaseadorDTO
+            var nuevoDueño = new DuenoDTO
             {
-                Id = idPaseadorSeleccionado,
+                Id = idDueñoSeleccionado,
                 Nombre = txtNombre.Text,
                 Apellido = txtApellido.Text,
                 Telefono = txtTelefono.Text,
                 Email = txtEmail.Text,
-                TarifaPorHora = decimal.Parse(txtTarifa.Text),
-                Zona = txtZona.Text
+                Direccion = txtDireccion.Text
             };
-
             try
             {
                 HttpResponseMessage response;
-
-                if(idPaseadorSeleccionado == 0)
+                if (idDueñoSeleccionado == 0)
                 {
-                    response = await client.PostAsJsonAsync(urlApi, nuevoPaseador);
+                    response = await client.PostAsJsonAsync(urlApi, nuevoDueño);
                 }
                 else
                 {
-                    response = await client.PutAsJsonAsync(urlApi, nuevoPaseador);
+                    response = await client.PutAsJsonAsync(urlApi, nuevoDueño);
                 }
-
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("¡Paseador guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -78,17 +74,10 @@ namespace Paseadores.WinForms
                     txtApellido.Clear();
                     txtEmail.Clear();
                     txtTelefono.Clear();
-                    txtTarifa.Clear();
-                    txtZona.Clear();
-                    idPaseadorSeleccionado = 0;
-                    await CargarPaseadoresAsync();
-                    dgvPaseadores.ClearSelection();
-                }
-                else
-                {
-                    // Leemos el mensaje exacto que nos mandó la API con los detalles del error
-                    string errorDetalle = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + errorDetalle, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtDireccion.Clear();
+                    idDueñoSeleccionado = 0;
+                    await CargarDueñosAsync();
+                    dgvDueños.ClearSelection();
                 }
             }
             catch (Exception ex)
@@ -96,40 +85,38 @@ namespace Paseadores.WinForms
                 MessageBox.Show("Hubo un error al intentar guardar:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             txtNombre.Clear();
             txtApellido.Clear();
             txtEmail.Clear();
             txtTelefono.Clear();
-            txtTarifa.Clear();
-            txtZona.Clear();
+            txtDireccion.Clear();
             txtNombre.Focus();
-            idPaseadorSeleccionado = 0;
-            dgvPaseadores.ClearSelection();
+            idDueñoSeleccionado = 0;
+            dgvDueños.ClearSelection();
         }
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvPaseadores.CurrentRow == null)
+            if (dgvDueños.CurrentRow == null)
             {
-                MessageBox.Show("Por favor, seleccioná un paseador de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Por favor, seleccioná un dueño de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            DialogResult respuesta = MessageBox.Show("¿Estás seguro de que querés eliminar a este paseador?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            DialogResult respuesta = MessageBox.Show("¿Estás seguro de que querés eliminar a este dueño?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (respuesta == DialogResult.Yes)
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvPaseadores.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvDueños.CurrentRow.Cells["colId"].Value);
                     HttpResponseMessage response = await client.DeleteAsync($"{urlApi}/{idSeleccionado}");
 
                     if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Paseador eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        await CargarPaseadoresAsync();
+                        MessageBox.Show("Dueño eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        await CargarDueñosAsync();
                     }
                     else
                     {
@@ -140,21 +127,21 @@ namespace Paseadores.WinForms
                 {
                     MessageBox.Show("Hubo un error al intentar conectar:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
             }
         }
 
-        private void dgvPaseadores_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvDueños_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
-            DataGridViewRow fila = dgvPaseadores.Rows[e.RowIndex];
+            DataGridViewRow fila = dgvDueños.Rows[e.RowIndex];
 
-            idPaseadorSeleccionado = Convert.ToInt32(fila.Cells["colId"].Value);
+            idDueñoSeleccionado = Convert.ToInt32(fila.Cells["colId"].Value);
             txtNombre.Text = fila.Cells["colNombre"].Value?.ToString();
             txtApellido.Text = fila.Cells["colApellido"].Value?.ToString();
             txtEmail.Text = fila.Cells["colEmail"].Value?.ToString();
             txtTelefono.Text = fila.Cells["colTelefono"].Value?.ToString();
-            txtTarifa.Text = fila.Cells["colTarifa"].Value?.ToString();
-            txtZona.Text = fila.Cells["colZona"].Value?.ToString();
+            txtDireccion.Text = fila.Cells["colDireccion"].Value?.ToString();
         }
     }
 }

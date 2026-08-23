@@ -28,5 +28,12 @@ namespace Paseadores.WinForms
             ventanaPaseadores.MdiParent = this;
             ventanaPaseadores.Show();
         }
+
+        private void dueñosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormDueños ventanaDueños = new FormDueños();
+            ventanaDueños.MdiParent = this;
+            ventanaDueños.Show();
+        }
     }
 }
