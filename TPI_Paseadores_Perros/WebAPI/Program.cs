@@ -1,8 +1,12 @@
-using WebAPI;
 using Application.Services;
 using Data;
+using Microsoft.EntityFrameworkCore;
+using WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<PaseadoresContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexionSQL")));
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
