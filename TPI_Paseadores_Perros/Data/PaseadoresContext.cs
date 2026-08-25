@@ -16,5 +16,14 @@ namespace Data
         }
         public DbSet<Paseador> Paseadores { get; set; }
         public DbSet<Dueno> Duenos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Paseador>()
+                .Property(p => p.TarifaPorHora)
+                .HasPrecision(10, 2);
+        }
     }
 }

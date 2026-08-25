@@ -68,7 +68,7 @@ namespace Paseadores.WinForms
                 }
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("¡Paseador guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("¡Dueño guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     txtNombre.Clear();
                     txtApellido.Clear();
