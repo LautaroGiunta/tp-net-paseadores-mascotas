@@ -12,6 +12,7 @@ namespace Paseadores.WinForms
 {
     public partial class FormMain : Form
     {
+        public bool QuiereCerrarSesion { get; set; } = false;
         public FormMain()
         {
             InitializeComponent();
@@ -34,6 +35,18 @@ namespace Paseadores.WinForms
             FormDueños ventanaDueños = new FormDueños();
             ventanaDueños.MdiParent = this;
             ventanaDueños.Show();
+        }
+
+        private void salirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            QuiereCerrarSesion = false;
+            this.Close();
+        }
+
+        private void cerrarSesiónToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            QuiereCerrarSesion = true;
+            this.Close();
         }
     }
 }

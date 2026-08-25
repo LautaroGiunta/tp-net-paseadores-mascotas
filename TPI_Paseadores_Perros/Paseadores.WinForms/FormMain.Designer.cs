@@ -58,14 +58,16 @@
             // cerrarSesiónToolStripMenuItem
             // 
             cerrarSesiónToolStripMenuItem.Name = "cerrarSesiónToolStripMenuItem";
-            cerrarSesiónToolStripMenuItem.Size = new Size(179, 26);
+            cerrarSesiónToolStripMenuItem.Size = new Size(224, 26);
             cerrarSesiónToolStripMenuItem.Text = "Cerrar Sesión";
+            cerrarSesiónToolStripMenuItem.Click += cerrarSesiónToolStripMenuItem_Click;
             // 
             // salirToolStripMenuItem
             // 
             salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            salirToolStripMenuItem.Size = new Size(179, 26);
+            salirToolStripMenuItem.Size = new Size(224, 26);
             salirToolStripMenuItem.Text = "Salir";
+            salirToolStripMenuItem.Click += salirToolStripMenuItem_Click;
             // 
             // gestionToolStripMenuItem
             // 
@@ -77,14 +79,14 @@
             // paseadoresToolStripMenuItem
             // 
             paseadoresToolStripMenuItem.Name = "paseadoresToolStripMenuItem";
-            paseadoresToolStripMenuItem.Size = new Size(224, 26);
+            paseadoresToolStripMenuItem.Size = new Size(166, 26);
             paseadoresToolStripMenuItem.Text = "Paseadores";
             paseadoresToolStripMenuItem.Click += paseadoresToolStripMenuItem_Click;
             // 
             // dueñosToolStripMenuItem
             // 
             dueñosToolStripMenuItem.Name = "dueñosToolStripMenuItem";
-            dueñosToolStripMenuItem.Size = new Size(224, 26);
+            dueñosToolStripMenuItem.Size = new Size(166, 26);
             dueñosToolStripMenuItem.Text = "Dueños";
             dueñosToolStripMenuItem.Click += dueñosToolStripMenuItem_Click;
             // 

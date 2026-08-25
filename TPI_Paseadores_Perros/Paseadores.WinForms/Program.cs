@@ -11,16 +11,27 @@ namespace Paseadores.WinForms
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            ApplicationConfiguration.Initialize(); // (Esta línea dejala como la tengas)
-
-            FormLogin login = new FormLogin();
-            if (login.ShowDialog() == DialogResult.OK)
+            bool ciclo = true;
+            while (ciclo)
             {
-                Application.Run(new FormMain());
-            }
-            else
-            {
-                Application.Exit();
+                FormLogin login = new FormLogin();
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    FormMain main = new FormMain();
+                    Application.Run(main);
+                    if (main.QuiereCerrarSesion)
+                    {
+                        ciclo = true;
+                    }
+                    else
+                    {
+                        ciclo =false;
+                    }
+                }
+                else
+                {
+                    Application.Exit();
+                }
             }
         }
     }
