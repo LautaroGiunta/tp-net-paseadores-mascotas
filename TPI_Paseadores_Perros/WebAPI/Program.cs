@@ -21,7 +21,12 @@ builder.Services.AddScoped<IDuenoRepository, DuenoRepository>();
 builder.Services.AddScoped<IDuenoService, DuenoService>();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<Data.PaseadoresContext>();
+    context.Database.Migrate();
 
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
