@@ -1,6 +1,7 @@
-using Domain.Model;
 using Data;
+using Domain.Model;
 using DTOs;
+using System.Text.RegularExpressions;
 
 namespace Application.Services
 {
@@ -15,6 +16,11 @@ namespace Application.Services
 
         public async Task<DuenoDTO> AddAsync(DuenoDTO dto)
         {
+            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
+            {
+                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+            }
             // Regla de negocio: el email no puede estar duplicado
             if (await duenoRepository.EmailExistsAsync(dto.Email))
             {
@@ -53,6 +59,11 @@ namespace Application.Services
 
         public async Task<bool> UpdateAsync(DuenoDTO dto)
         {
+            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
+            {
+                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+            }
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio dueño)
             if (await duenoRepository.EmailExistsAsync(dto.Email, dto.Id))
             {

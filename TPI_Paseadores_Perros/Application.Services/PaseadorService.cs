@@ -1,6 +1,7 @@
-using Domain.Model;
 using Data;
+using Domain.Model;
 using DTOs;
+using System.Text.RegularExpressions;
 
 namespace Application.Services
 {
@@ -15,12 +16,21 @@ namespace Application.Services
 
         public async Task<PaseadorDTO> AddAsync(PaseadorDTO dto)
         {
+            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
+            {
+                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+            }
             // Regla de negocio: el email no puede estar duplicado
             if (await paseadorRepository.EmailExistsAsync(dto.Email))
             {
                 throw new ArgumentException($"Ya existe un paseador con el email '{dto.Email}'.");
             }
-
+            // Validar que la tarifa sea un valor lógico
+            if (dto.TarifaPorHora <= 0)
+            {
+                throw new ArgumentException("La tarifa por hora debe ser mayor a cero.");
+            }
             var fechaAlta = DateTime.Now;
             Paseador paseador = new Paseador(0, dto.Nombre, dto.Apellido, dto.Email,
                                              dto.Telefono, dto.Zona, dto.TarifaPorHora, fechaAlta);
@@ -53,10 +63,21 @@ namespace Application.Services
 
         public async Task<bool> UpdateAsync(PaseadorDTO dto)
         {
+            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
+            {
+                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+            }
+
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio paseador)
             if (await paseadorRepository.EmailExistsAsync(dto.Email, dto.Id))
             {
                 throw new ArgumentException($"Ya existe otro paseador con el email '{dto.Email}'.");
+            }
+            // Validar que la tarifa sea un valor lógico
+            if (dto.TarifaPorHora <= 0)
+            {
+                throw new ArgumentException("La tarifa por hora debe ser mayor a cero.");
             }
 
             // Recuperar el existente para preservar la FechaAlta
