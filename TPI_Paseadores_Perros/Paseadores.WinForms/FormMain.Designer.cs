@@ -35,6 +35,8 @@
             gestionToolStripMenuItem = new ToolStripMenuItem();
             paseadoresToolStripMenuItem = new ToolStripMenuItem();
             dueñosToolStripMenuItem = new ToolStripMenuItem();
+            perrosToolStripMenuItem = new ToolStripMenuItem();
+            paseosToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -71,7 +73,7 @@
             // 
             // gestionToolStripMenuItem
             // 
-            gestionToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { paseadoresToolStripMenuItem, dueñosToolStripMenuItem });
+            gestionToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { paseadoresToolStripMenuItem, dueñosToolStripMenuItem, perrosToolStripMenuItem, paseosToolStripMenuItem });
             gestionToolStripMenuItem.Name = "gestionToolStripMenuItem";
             gestionToolStripMenuItem.Size = new Size(73, 24);
             gestionToolStripMenuItem.Text = "Gestión";
@@ -89,6 +91,20 @@
             dueñosToolStripMenuItem.Size = new Size(166, 26);
             dueñosToolStripMenuItem.Text = "Dueños";
             dueñosToolStripMenuItem.Click += dueñosToolStripMenuItem_Click;
+            // 
+            // perrosToolStripMenuItem
+            // 
+            perrosToolStripMenuItem.Name = "perrosToolStripMenuItem";
+            perrosToolStripMenuItem.Size = new Size(166, 26);
+            perrosToolStripMenuItem.Text = "Perros";
+            perrosToolStripMenuItem.Click += perrosToolStripMenuItem_Click;
+            // 
+            // paseosToolStripMenuItem
+            // 
+            paseosToolStripMenuItem.Name = "paseosToolStripMenuItem";
+            paseosToolStripMenuItem.Size = new Size(166, 26);
+            paseosToolStripMenuItem.Text = "Paseos";
+            paseosToolStripMenuItem.Click += paseosToolStripMenuItem_Click;
             // 
             // FormMain
             // 
@@ -117,5 +133,7 @@
         private ToolStripMenuItem gestionToolStripMenuItem;
         private ToolStripMenuItem paseadoresToolStripMenuItem;
         private ToolStripMenuItem dueñosToolStripMenuItem;
+        private ToolStripMenuItem perrosToolStripMenuItem;
+        private ToolStripMenuItem paseosToolStripMenuItem;
     }
 }

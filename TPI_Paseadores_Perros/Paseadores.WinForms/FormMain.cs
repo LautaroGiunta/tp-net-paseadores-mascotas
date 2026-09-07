@@ -37,6 +37,20 @@ namespace Paseadores.WinForms
             ventanaDueños.Show();
         }
 
+        private void perrosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormPerros ventanaPerros = new FormPerros();
+            ventanaPerros.MdiParent = this;
+            ventanaPerros.Show();
+        }
+
+        private void paseosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormPaseos ventanaPaseos = new FormPaseos();
+            ventanaPaseos.MdiParent = this;
+            ventanaPaseos.Show();
+        }
+
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             QuiereCerrarSesion = false;
