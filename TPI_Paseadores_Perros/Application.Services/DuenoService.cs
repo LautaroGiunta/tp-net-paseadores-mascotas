@@ -8,10 +8,12 @@ namespace Application.Services
     public class DuenoService : IDuenoService
     {
         private readonly IDuenoRepository duenoRepository;
+        private readonly IPerroRepository perroRepository;
 
-        public DuenoService(IDuenoRepository duenoRepository)
+        public DuenoService(IDuenoRepository duenoRepository, IPerroRepository perroRepository)
         {
             this.duenoRepository = duenoRepository;
+            this.perroRepository = perroRepository;
         }
 
         public async Task<DuenoDTO> AddAsync(DuenoDTO dto)
@@ -38,6 +40,12 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            // Regla de negocio: no se puede borrar un dueño que tenga perros cargados
+            if ((await perroRepository.GetByDuenoAsync(id)).Any())
+            {
+                throw new ArgumentException("No se puede eliminar el dueño porque tiene perros registrados.");
+            }
+
             return await duenoRepository.DeleteAsync(id);
         }
 

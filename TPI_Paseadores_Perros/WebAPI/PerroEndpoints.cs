@@ -3,13 +3,13 @@ using DTOs;
 
 namespace WebAPI
 {
-    public static class DuenoEndpoints
+    public static class PerroEndpoints
     {
-        public static void MapDuenoEndpoints(this WebApplication app)
+        public static void MapPerroEndpoints(this WebApplication app)
         {
-            app.MapGet("/duenos/{id}", async (int id, IDuenoService duenoService) =>
+            app.MapGet("/perros/{id}", async (int id, IPerroService perroService) =>
             {
-                DuenoDTO? dto = await duenoService.GetAsync(id);
+                PerroDTO? dto = await perroService.GetAsync(id);
 
                 if (dto == null)
                 {
@@ -18,42 +18,51 @@ namespace WebAPI
 
                 return Results.Ok(dto);
             })
-            .WithName("GetDueno")
-            .Produces<DuenoDTO>(StatusCodes.Status200OK)
+            .WithName("GetPerro")
+            .Produces<PerroDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
-            app.MapGet("/duenos", async (IDuenoService duenoService) =>
+            app.MapGet("/perros", async (IPerroService perroService) =>
             {
-                var dtos = await duenoService.GetAllAsync();
+                var dtos = await perroService.GetAllAsync();
                 return Results.Ok(dtos);
             })
-            .WithName("GetAllDuenos")
-            .Produces<List<DuenoDTO>>(StatusCodes.Status200OK)
+            .WithName("GetAllPerros")
+            .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
-            app.MapPost("/duenos", async (DuenoDTO dto, IDuenoService duenoService) =>
+            app.MapGet("/duenos/{duenoId}/perros", async (int duenoId, IPerroService perroService) =>
+            {
+                var dtos = await perroService.GetByDuenoAsync(duenoId);
+                return Results.Ok(dtos);
+            })
+            .WithName("GetPerrosByDueno")
+            .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
+            .WithOpenApi();
+
+            app.MapPost("/perros", async (PerroDTO dto, IPerroService perroService) =>
             {
                 try
                 {
-                    DuenoDTO duenoDTO = await duenoService.AddAsync(dto);
-                    return Results.Created($"/duenos/{duenoDTO.Id}", duenoDTO);
+                    PerroDTO perroDTO = await perroService.AddAsync(dto);
+                    return Results.Created($"/perros/{perroDTO.Id}", perroDTO);
                 }
                 catch (ArgumentException ex)
                 {
                     return Results.BadRequest(new { error = ex.Message });
                 }
             })
-            .WithName("AddDueno")
-            .Produces<DuenoDTO>(StatusCodes.Status201Created)
+            .WithName("AddPerro")
+            .Produces<PerroDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/duenos", async (DuenoDTO dto, IDuenoService duenoService) =>
+            app.MapPut("/perros", async (PerroDTO dto, IPerroService perroService) =>
             {
                 try
                 {
-                    var found = await duenoService.UpdateAsync(dto);
+                    var found = await perroService.UpdateAsync(dto);
 
                     if (!found)
                     {
@@ -67,17 +76,17 @@ namespace WebAPI
                     return Results.BadRequest(new { error = ex.Message });
                 }
             })
-            .WithName("UpdateDueno")
+            .WithName("UpdatePerro")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapDelete("/duenos/{id}", async (int id, IDuenoService duenoService) =>
+            app.MapDelete("/perros/{id}", async (int id, IPerroService perroService) =>
             {
                 try
                 {
-                    var deleted = await duenoService.DeleteAsync(id);
+                    var deleted = await perroService.DeleteAsync(id);
 
                     if (!deleted)
                     {
@@ -91,7 +100,7 @@ namespace WebAPI
                     return Results.BadRequest(new { error = ex.Message });
                 }
             })
-            .WithName("DeleteDueno")
+            .WithName("DeletePerro")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)

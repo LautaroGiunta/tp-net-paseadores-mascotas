@@ -20,6 +20,14 @@ builder.Services.AddScoped<IPaseadorService, PaseadorService>();
 builder.Services.AddScoped<IDuenoRepository, DuenoRepository>();
 builder.Services.AddScoped<IDuenoService, DuenoService>();
 
+// Inyección de dependencias - Perro
+builder.Services.AddScoped<IPerroRepository, PerroRepository>();
+builder.Services.AddScoped<IPerroService, PerroService>();
+
+// Inyección de dependencias - Paseo
+builder.Services.AddScoped<IPaseoRepository, PaseoRepository>();
+builder.Services.AddScoped<IPaseoService, PaseoService>();
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -42,5 +50,7 @@ if (!app.Environment.IsDevelopment())
 // Mapeo de endpoints
 app.MapPaseadorEndpoints();
 app.MapDuenoEndpoints();
+app.MapPerroEndpoints();
+app.MapPaseoEndpoints();
 
 app.Run();

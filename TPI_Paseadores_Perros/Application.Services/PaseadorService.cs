@@ -8,10 +8,12 @@ namespace Application.Services
     public class PaseadorService : IPaseadorService
     {
         private readonly IPaseadorRepository paseadorRepository;
+        private readonly IPaseoRepository paseoRepository;
 
-        public PaseadorService(IPaseadorRepository paseadorRepository)
+        public PaseadorService(IPaseadorRepository paseadorRepository, IPaseoRepository paseoRepository)
         {
             this.paseadorRepository = paseadorRepository;
+            this.paseoRepository = paseoRepository;
         }
 
         public async Task<PaseadorDTO> AddAsync(PaseadorDTO dto)
@@ -42,6 +44,12 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            // Regla de negocio: no se puede borrar un paseador que tenga paseos agendados
+            if ((await paseoRepository.GetByCriteriaAsync(new PaseoCriteria(id, null, null, null))).Any())
+            {
+                throw new ArgumentException("No se puede eliminar el paseador porque tiene paseos registrados.");
+            }
+
             return await paseadorRepository.DeleteAsync(id);
         }
 
