@@ -31,7 +31,7 @@ namespace Application.Services
 
             var fechaAlta = DateTime.Now;
             Dueno dueno = new Dueno(0, dto.Nombre, dto.Apellido, dto.Email,
-                                    dto.Telefono, dto.Direccion, fechaAlta);
+                                    dto.Telefono, dto.Direccion,dto.Contrasena, fechaAlta);
 
             await duenoRepository.AddAsync(dueno);
 
@@ -84,7 +84,7 @@ namespace Application.Services
                 return false;
 
             Dueno dueno = new Dueno(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
-                                    dto.Telefono, dto.Direccion, existing.FechaAlta);
+                                    dto.Telefono, dto.Direccion, dto.Contrasena, existing.FechaAlta);
             return await duenoRepository.UpdateAsync(dueno);
         }
 
@@ -98,6 +98,8 @@ namespace Application.Services
                 Email = dueno.Email,
                 Telefono = dueno.Telefono,
                 Direccion = dueno.Direccion,
+                Contrasena = dueno.Contrasena,
+                Rol = dueno.Rol.ToString(),
                 FechaAlta = dueno.FechaAlta
             };
         }

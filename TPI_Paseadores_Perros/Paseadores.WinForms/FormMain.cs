@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,11 +14,40 @@ namespace Paseadores.WinForms
     public partial class FormMain : Form
     {
         public bool QuiereCerrarSesion { get; set; } = false;
-        public FormMain()
+        private UsuarioDTO _usuarioActual;
+        public FormMain(UsuarioDTO usuarioLogueado)
         {
             InitializeComponent();
+            _usuarioActual = usuarioLogueado;
+            ConfigurarToolbar();
         }
 
+        private void ConfigurarToolbar()
+        {
+            // Por defecto, asumimos que el Admin ve todo, así que no ocultamos nada.
+            // Pero si es Dueño o Paseador, empezamos a ocultar cosas:
+
+            if (_usuarioActual.Rol == "Dueno")
+            {
+                // Ejemplo: Un dueño no debería poder gestionar a otros dueños.
+                // Ocultamos el botón de la toolbar (REEMPLAZÁ "btnDuenos" POR EL NOMBRE REAL DE TU BOTÓN)
+                dueñosToolStripMenuItem.Visible = false;
+                paseadoresToolStripMenuItem.Visible = false;
+
+            }
+            else if (_usuarioActual.Rol == "Paseador")
+            {
+                // Ejemplo: Un paseador no debería poder agregar o borrar paseadores.
+                dueñosToolStripMenuItem.Visible = false;
+                paseadoresToolStripMenuItem.Visible = false;
+                perrosToolStripMenuItem.Visible = false;
+            }
+            else if (_usuarioActual.Rol == "Admin")
+            {
+                // El Admin ve todo. Podés poner un mensajito en el título del form para que quede lindo
+                this.Text = $"Panel de Administración - Bienvenido {_usuarioActual.Nombre}";
+            }
+        }
         private void FormMain_Load(object sender, EventArgs e)
         {
 

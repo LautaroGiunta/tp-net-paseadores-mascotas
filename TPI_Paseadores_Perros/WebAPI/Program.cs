@@ -12,6 +12,10 @@ builder.Services.AddDbContext<PaseadoresContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Inyección de dependencias - Usuario
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // Inyección de dependencias - Paseador
 builder.Services.AddScoped<IPaseadorRepository, PaseadorRepository>();
 builder.Services.AddScoped<IPaseadorService, PaseadorService>();
@@ -52,5 +56,6 @@ app.MapPaseadorEndpoints();
 app.MapDuenoEndpoints();
 app.MapPerroEndpoints();
 app.MapPaseoEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();

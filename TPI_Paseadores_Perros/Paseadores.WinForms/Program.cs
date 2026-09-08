@@ -17,7 +17,7 @@ namespace Paseadores.WinForms
                 FormLogin login = new FormLogin();
                 if (login.ShowDialog() == DialogResult.OK)
                 {
-                    FormMain main = new FormMain();
+                    FormMain main = new FormMain(login.UsuarioLogueado);
                     Application.Run(main);
                     if (main.QuiereCerrarSesion)
                     {

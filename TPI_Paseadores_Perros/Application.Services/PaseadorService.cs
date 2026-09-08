@@ -35,7 +35,7 @@ namespace Application.Services
             }
             var fechaAlta = DateTime.Now;
             Paseador paseador = new Paseador(0, dto.Nombre, dto.Apellido, dto.Email,
-                                             dto.Telefono, dto.Zona, dto.TarifaPorHora, fechaAlta);
+                                             dto.Telefono, dto.Zona, dto.TarifaPorHora,dto.Contrasena, fechaAlta);
 
             await paseadorRepository.AddAsync(paseador);
 
@@ -94,7 +94,7 @@ namespace Application.Services
                 return false;
 
             Paseador paseador = new Paseador(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
-                                             dto.Telefono, dto.Zona, dto.TarifaPorHora, existing.FechaAlta);
+                                             dto.Telefono, dto.Zona, dto.TarifaPorHora, dto.Contrasena, existing.FechaAlta);
             return await paseadorRepository.UpdateAsync(paseador);
         }
 
@@ -116,6 +116,8 @@ namespace Application.Services
                 Telefono = paseador.Telefono,
                 Zona = paseador.Zona,
                 TarifaPorHora = paseador.TarifaPorHora,
+                Contrasena = paseador.Contrasena,
+                Rol = paseador.Rol.ToString(),
                 FechaAlta = paseador.FechaAlta
             };
         }

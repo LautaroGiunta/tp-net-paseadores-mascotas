@@ -14,6 +14,7 @@ namespace Data
         public PaseadoresContext(DbContextOptions<PaseadoresContext> options) : base(options)
         {
         }
+        public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Paseador> Paseadores { get; set; }
         public DbSet<Dueno> Duenos { get; set; }
         public DbSet<Perro> Perros { get; set; }
@@ -23,7 +24,13 @@ namespace Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            modelBuilder.Entity<Usuario>().ToTable("Usuarios");
+            modelBuilder.Entity<Dueno>().ToTable("Duenos");
+
+
             modelBuilder.Entity<Paseador>()
+                .ToTable("Paseadores")
                 .Property(p => p.TarifaPorHora)
                 .HasPrecision(10, 2);
 

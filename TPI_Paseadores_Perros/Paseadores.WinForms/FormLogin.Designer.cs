@@ -28,54 +28,51 @@
         /// </summary>
         private void InitializeComponent()
         {
-            txtUsuario = new TextBox();
+            txtEmail = new TextBox();
             txtContraseña = new TextBox();
             label1 = new Label();
             label2 = new Label();
             btnIngresar = new Button();
             SuspendLayout();
             // 
-            // txtUsuario
+            // txtEmail
             // 
-            txtUsuario.Location = new Point(55, 51);
-            txtUsuario.Margin = new Padding(3, 2, 3, 2);
-            txtUsuario.Name = "txtUsuario";
-            txtUsuario.Size = new Size(268, 23);
-            txtUsuario.TabIndex = 0;
+            txtEmail.Location = new Point(63, 68);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(306, 27);
+            txtEmail.TabIndex = 0;
             // 
             // txtContraseña
             // 
-            txtContraseña.Location = new Point(55, 113);
-            txtContraseña.Margin = new Padding(3, 2, 3, 2);
+            txtContraseña.Location = new Point(63, 151);
             txtContraseña.Name = "txtContraseña";
             txtContraseña.PasswordChar = '*';
-            txtContraseña.Size = new Size(268, 23);
+            txtContraseña.Size = new Size(306, 27);
             txtContraseña.TabIndex = 1;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(55, 25);
+            label1.Location = new Point(63, 33);
             label1.Name = "label1";
-            label1.Size = new Size(47, 15);
+            label1.Size = new Size(46, 20);
             label1.TabIndex = 3;
-            label1.Text = "Usuario";
+            label1.Text = "Email";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(55, 87);
+            label2.Location = new Point(63, 116);
             label2.Name = "label2";
-            label2.Size = new Size(67, 15);
+            label2.Size = new Size(83, 20);
             label2.TabIndex = 4;
             label2.Text = "Contraseña";
             // 
             // btnIngresar
             // 
-            btnIngresar.Location = new Point(55, 196);
-            btnIngresar.Margin = new Padding(3, 2, 3, 2);
+            btnIngresar.Location = new Point(63, 261);
             btnIngresar.Name = "btnIngresar";
-            btnIngresar.Size = new Size(268, 28);
+            btnIngresar.Size = new Size(306, 37);
             btnIngresar.TabIndex = 2;
             btnIngresar.Text = "Ingresar";
             btnIngresar.UseVisualStyleBackColor = true;
@@ -84,16 +81,15 @@
             // FormLogin
             // 
             AcceptButton = btnIngresar;
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(384, 261);
+            ClientSize = new Size(439, 348);
             Controls.Add(btnIngresar);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(txtContraseña);
-            Controls.Add(txtUsuario);
+            Controls.Add(txtEmail);
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            Margin = new Padding(3, 2, 3, 2);
             MaximizeBox = false;
             Name = "FormLogin";
             StartPosition = FormStartPosition.CenterScreen;
@@ -104,7 +100,7 @@
 
         #endregion
 
-        private TextBox txtUsuario;
+        private TextBox txtEmail;
         private TextBox txtContraseña;
         private Label label1;
         private Label label2;
