@@ -1,4 +1,4 @@
-namespace Paseadores.WinForms
+﻿namespace Paseadores.WinForms
 {
     internal static class Program
     {
@@ -15,10 +15,14 @@ namespace Paseadores.WinForms
             while (ciclo)
             {
                 FormLogin login = new FormLogin();
-                if (login.ShowDialog() == DialogResult.OK)
+                if (login.ShowDialog() == DialogResult.OK && login.UsuarioLogueado != null)
                 {
                     FormMain main = new FormMain(login.UsuarioLogueado);
                     Application.Run(main);
+
+                    // El token era de la sesión que se cerró
+                    ApiClient.CerrarSesion();
+
                     if (main.QuiereCerrarSesion)
                     {
                         ciclo = true;
@@ -31,6 +35,7 @@ namespace Paseadores.WinForms
                 else
                 {
                     Application.Exit();
+                    ciclo = false;
                 }
             }
         }

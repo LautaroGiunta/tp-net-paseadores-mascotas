@@ -19,6 +19,7 @@ namespace WebAPI
                 return Results.Ok(dto);
             })
             .WithName("GetPaseo")
+            .RequireAuthorization()
             .Produces<PaseoDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
@@ -29,6 +30,7 @@ namespace WebAPI
                 return Results.Ok(dtos);
             })
             .WithName("GetAllPaseos")
+            .RequireAuthorization()
             .Produces<List<PaseoDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
@@ -53,6 +55,7 @@ namespace WebAPI
                 }
             })
             .WithName("GetPaseosByCriteria")
+            .RequireAuthorization()
             .Produces<List<PaseoDTO>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -70,6 +73,7 @@ namespace WebAPI
                 }
             })
             .WithName("AddPaseo")
+            .RequireAuthorization(Politicas.GestionDePaseos)
             .Produces<PaseoDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -93,6 +97,7 @@ namespace WebAPI
                 }
             })
             .WithName("UpdatePaseo")
+            .RequireAuthorization(Politicas.GestionDePaseos)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -110,6 +115,7 @@ namespace WebAPI
                 return Results.NoContent();
             })
             .WithName("DeletePaseo")
+            .RequireAuthorization(Politicas.GestionDePaseos)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();

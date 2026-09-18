@@ -14,9 +14,9 @@ namespace Paseadores.WinForms
 {
     public partial class FormDueños : Form
     {
-        private static readonly HttpClient client = new HttpClient();
+        private static HttpClient client => ApiClient.Http;
         int idDueñoSeleccionado = 0;
-        private readonly string urlApi = "https://localhost:7140/duenos";
+        private readonly string urlApi = "/duenos";
         public FormDueños()
         {
             InitializeComponent();

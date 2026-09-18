@@ -1,4 +1,4 @@
-using DTOs;
+﻿using DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,12 +14,12 @@ namespace Paseadores.WinForms
 {
     public partial class FormPerros : Form
     {
-        private static readonly HttpClient client = new HttpClient();
+        private static HttpClient client => ApiClient.Http;
         private int idPerroSeleccionado = 0;
         private List<PerroDTO> perrosCargados = new List<PerroDTO>();
 
-        private readonly string urlApi = "https://localhost:7140/perros";
-        private readonly string urlDuenos = "https://localhost:7140/duenos";
+        private readonly string urlApi = "/perros";
+        private readonly string urlDuenos = "/duenos";
 
         public FormPerros()
         {

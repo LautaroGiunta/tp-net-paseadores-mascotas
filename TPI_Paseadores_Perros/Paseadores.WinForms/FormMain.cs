@@ -24,29 +24,22 @@ namespace Paseadores.WinForms
 
         private void ConfigurarToolbar()
         {
-            // Por defecto, asumimos que el Admin ve todo, así que no ocultamos nada.
-            // Pero si es Dueño o Paseador, empezamos a ocultar cosas:
-
+            // El menú se recorta según el rol, igual que las políticas de la WebAPI
             if (_usuarioActual.Rol == "Dueno")
             {
-                // Ejemplo: Un dueño no debería poder gestionar a otros dueños.
-                // Ocultamos el botón de la toolbar (REEMPLAZÁ "btnDuenos" POR EL NOMBRE REAL DE TU BOTÓN)
+                // Un dueño administra sus perros y sus paseos, no a los demás usuarios
                 dueñosToolStripMenuItem.Visible = false;
                 paseadoresToolStripMenuItem.Visible = false;
-
             }
             else if (_usuarioActual.Rol == "Paseador")
             {
-                // Ejemplo: Un paseador no debería poder agregar o borrar paseadores.
+                // Un paseador solo opera la agenda de paseos
                 dueñosToolStripMenuItem.Visible = false;
                 paseadoresToolStripMenuItem.Visible = false;
                 perrosToolStripMenuItem.Visible = false;
             }
-            else if (_usuarioActual.Rol == "Admin")
-            {
-                // El Admin ve todo. Podés poner un mensajito en el título del form para que quede lindo
-                this.Text = $"Panel de Administración - Bienvenido {_usuarioActual.Nombre}";
-            }
+
+            this.Text = $"Paseadores de Perros - {_usuarioActual.Nombre} {_usuarioActual.Apellido} ({_usuarioActual.Rol})";
         }
         private void FormMain_Load(object sender, EventArgs e)
         {

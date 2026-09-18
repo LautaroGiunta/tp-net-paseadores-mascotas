@@ -38,8 +38,8 @@ namespace Data
                 .Property(p => p.PrecioTotal)
                 .HasPrecision(10, 2);
 
-            // Como las entidades no tienen propiedades de navegacion, las claves foraneas
-            // se declaran a mano. Restrict evita que borrar un dueno arrastre a sus perros.
+            // Sin propiedades de navegación, las claves foráneas se declaran a mano.
+            // Restrict evita que borrar un dueño arrastre a sus perros
             modelBuilder.Entity<Perro>()
                 .HasOne<Dueno>()
                 .WithMany()
@@ -57,6 +57,27 @@ namespace Data
                 .WithMany()
                 .HasForeignKey(p => p.PerroId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            SeedUsuarios(modelBuilder);
+        }
+
+        // Uno por cada rol, si no la tabla nace vacía y no hay con quien entrar
+        private static void SeedUsuarios(ModelBuilder modelBuilder)
+        {
+            // Fija a propósito: con DateTime.Now, EF ve un cambio en cada migración
+            var fechaAlta = new DateTime(2026, 1, 1);
+
+            modelBuilder.Entity<Usuario>().HasData(
+                new Usuario(1, "Admin", "Sistema", "admin@paseos.com", "3415550100",
+                            "Admin123", RolUsuario.Admin, fechaAlta));
+
+            modelBuilder.Entity<Dueno>().HasData(
+                new Dueno(2, "Ana", "Gomez", "ana.gomez@paseos.com", "3415550101",
+                          "Sarmiento 1234", "Dueno123", fechaAlta));
+
+            modelBuilder.Entity<Paseador>().HasData(
+                new Paseador(3, "Carlos", "Ruiz", "carlos.ruiz@paseos.com", "3415550102",
+                             "Centro", 3500m, "Paseo123", fechaAlta));
         }
     }
 }

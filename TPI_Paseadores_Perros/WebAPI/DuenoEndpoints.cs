@@ -19,6 +19,7 @@ namespace WebAPI
                 return Results.Ok(dto);
             })
             .WithName("GetDueno")
+            .RequireAuthorization()
             .Produces<DuenoDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
@@ -29,6 +30,7 @@ namespace WebAPI
                 return Results.Ok(dtos);
             })
             .WithName("GetAllDuenos")
+            .RequireAuthorization()
             .Produces<List<DuenoDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
@@ -45,6 +47,7 @@ namespace WebAPI
                 }
             })
             .WithName("AddDueno")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces<DuenoDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -68,6 +71,7 @@ namespace WebAPI
                 }
             })
             .WithName("UpdateDueno")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -92,6 +96,7 @@ namespace WebAPI
                 }
             })
             .WithName("DeleteDueno")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)

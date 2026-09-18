@@ -19,6 +19,7 @@ namespace WebAPI
                 return Results.Ok(dto);
             })
             .WithName("GetPaseador")
+            .RequireAuthorization()
             .Produces<PaseadorDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
@@ -29,6 +30,7 @@ namespace WebAPI
                 return Results.Ok(dtos);
             })
             .WithName("GetAllPaseadores")
+            .RequireAuthorization()
             .Produces<List<PaseadorDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
@@ -46,6 +48,7 @@ namespace WebAPI
                 }
             })
             .WithName("GetPaseadoresByCriteria")
+            .RequireAuthorization()
             .Produces<List<PaseadorDTO>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -63,6 +66,7 @@ namespace WebAPI
                 }
             })
             .WithName("AddPaseador")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces<PaseadorDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -86,6 +90,7 @@ namespace WebAPI
                 }
             })
             .WithName("UpdatePaseador")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -110,6 +115,7 @@ namespace WebAPI
                 }
             })
             .WithName("DeletePaseador")
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)

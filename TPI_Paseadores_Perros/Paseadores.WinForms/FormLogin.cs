@@ -1,20 +1,13 @@
 ﻿using DTOs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Paseadores.WinForms
 {
     public partial class FormLogin : Form
     {
-        public UsuarioDTO UsuarioLogueado { get; private set; }
+        public UsuarioDTO? UsuarioLogueado { get; private set; }
         public FormLogin()
         {
             InitializeComponent();
@@ -31,27 +24,32 @@ namespace Paseadores.WinForms
 
             try
             {
-
-                var loginData = new
+                var loginData = new LoginRequestDTO
                 {
-                    Email = txtEmail.Text,
+                    Email = txtEmail.Text.Trim(),
                     Contrasena = txtContraseña.Text
                 };
 
-                //  Preparamos el cliente ignorando el certificado de desarrollo de HTTPS
-                using HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri("http://localhost:5206"); 
-
                 //  Hacemos el POST al endpoint que creamos
-                HttpResponseMessage response = await client.PostAsJsonAsync("/api/auth/login", loginData);
+                HttpResponseMessage response = await ApiClient.Http.PostAsJsonAsync("/api/auth/login", loginData);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    UsuarioLogueado = await response.Content.ReadFromJsonAsync<UsuarioDTO>();
+                    LoginResponseDTO? respuesta = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+
+                    if (respuesta == null || string.IsNullOrWhiteSpace(respuesta.Token))
+                    {
+                        MessageBox.Show("La API no devolvió un token válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // A partir de acá todas las llamadas llevan el token
+                    ApiClient.GuardarToken(respuesta.Token);
+                    UsuarioLogueado = respuesta.Usuario;
+
                     this.DialogResult = DialogResult.OK;
 
                     MessageBox.Show($"¡Bienvenido {UsuarioLogueado.Nombre}!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {

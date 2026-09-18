@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Domain.Model;
 using DTOs;
 using System.Text.RegularExpressions;
@@ -116,7 +116,7 @@ namespace Application.Services
                 Telefono = paseador.Telefono,
                 Zona = paseador.Zona,
                 TarifaPorHora = paseador.TarifaPorHora,
-                Contrasena = paseador.Contrasena,
+                // La contraseña no se devuelve
                 Rol = paseador.Rol.ToString(),
                 FechaAlta = paseador.FechaAlta
             };

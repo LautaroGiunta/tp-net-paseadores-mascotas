@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Domain.Model;
 using DTOs;
 using System.Text.RegularExpressions;
@@ -98,7 +98,7 @@ namespace Application.Services
                 Email = dueno.Email,
                 Telefono = dueno.Telefono,
                 Direccion = dueno.Direccion,
-                Contrasena = dueno.Contrasena,
+                // La contraseña no se devuelve
                 Rol = dueno.Rol.ToString(),
                 FechaAlta = dueno.FechaAlta
             };

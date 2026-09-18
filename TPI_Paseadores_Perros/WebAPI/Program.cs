@@ -1,6 +1,10 @@
+﻿using System.Text;
 using Application.Services;
 using Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,10 +14,70 @@ builder.Services.AddDbContext<PaseadoresContext>(options =>
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Swagger con el botón Authorize para pegar el token del login
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Pegar unicamente el token devuelto por /api/auth/login (sin escribir 'Bearer')."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// La misma configuración usa TokenService para firmar y la API para validar
+var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>()
+    ?? throw new InvalidOperationException("Falta la seccion 'Jwt' en appsettings.json.");
+
+builder.Services.AddSingleton(jwtConfig);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtConfig.Emisor,
+            ValidAudience = jwtConfig.Audiencia,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.ClaveSecreta)),
+            // Sin margen extra sobre el vencimiento
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Politicas.SoloAdmin, politica =>
+        politica.RequireRole(Roles.Admin));
+
+    options.AddPolicy(Politicas.AdminODueno, politica =>
+        politica.RequireRole(Roles.Admin, Roles.Dueno));
+
+    options.AddPolicy(Politicas.GestionDePaseos, politica =>
+        politica.RequireRole(Roles.Admin, Roles.Dueno, Roles.Paseador));
+});
 
 // Inyección de dependencias - Usuario
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Inyección de dependencias - Paseador
@@ -50,6 +114,9 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Mapeo de endpoints
 app.MapPaseadorEndpoints();

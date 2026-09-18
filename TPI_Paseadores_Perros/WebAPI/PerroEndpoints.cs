@@ -19,6 +19,7 @@ namespace WebAPI
                 return Results.Ok(dto);
             })
             .WithName("GetPerro")
+            .RequireAuthorization()
             .Produces<PerroDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
@@ -29,6 +30,7 @@ namespace WebAPI
                 return Results.Ok(dtos);
             })
             .WithName("GetAllPerros")
+            .RequireAuthorization()
             .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
@@ -38,6 +40,7 @@ namespace WebAPI
                 return Results.Ok(dtos);
             })
             .WithName("GetPerrosByDueno")
+            .RequireAuthorization()
             .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
@@ -54,6 +57,7 @@ namespace WebAPI
                 }
             })
             .WithName("AddPerro")
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces<PerroDTO>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
@@ -77,6 +81,7 @@ namespace WebAPI
                 }
             })
             .WithName("UpdatePerro")
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)
@@ -101,6 +106,7 @@ namespace WebAPI
                 }
             })
             .WithName("DeletePerro")
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status400BadRequest)

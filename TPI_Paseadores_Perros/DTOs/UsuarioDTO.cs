@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DTOs
+﻿namespace DTOs
 {
     public class UsuarioDTO
     {
@@ -13,7 +7,10 @@ namespace DTOs
         public string Apellido { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
+
+        // Solo se usa para el alta y la modificación, los servicios no la devuelven
         public string Contrasena { get; set; } = string.Empty;
+
         public string Rol { get; set; } = string.Empty;
         public DateTime FechaAlta { get; set; }
     }

@@ -1,8 +1,6 @@
 ﻿using Application.Services;
 using DTOs;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+
 namespace WebAPI
 {
     public static class AuthEndpoints
@@ -13,18 +11,25 @@ namespace WebAPI
             {
                 if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Contrasena))
                 {
-                    return Results.BadRequest("El email y la contraseña son obligatorios.");
+                    return Results.BadRequest(new { error = "El email y la contraseña son obligatorios." });
                 }
 
-                var usuarioLogueado = await authService.LoginAsync(dto);
+                var respuesta = await authService.LoginAsync(dto);
 
-                if (usuarioLogueado == null)
+                if (respuesta == null)
                 {
                     return Results.Json(new { mensaje = "Email o contraseña incorrectos." }, statusCode: StatusCodes.Status401Unauthorized);
                 }
 
-                return Results.Ok(usuarioLogueado);
-            });
+                return Results.Ok(respuesta);
+            })
+            .WithName("Login")
+            // El único endpoint que no pide token
+            .AllowAnonymous()
+            .Produces<LoginResponseDTO>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithOpenApi();
         }
     }
 }

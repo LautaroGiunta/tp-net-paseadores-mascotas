@@ -14,10 +14,10 @@ namespace Paseadores.WinForms
 {
     public partial class FormPaseadores : Form
     {
-        private static readonly HttpClient client = new HttpClient();
+        private static HttpClient client => ApiClient.Http;
         private int idPaseadorSeleccionado = 0;
 
-        private readonly string urlApi = "https://localhost:7140/paseadores";
+        private readonly string urlApi = "/paseadores";
         public FormPaseadores()
         {
             InitializeComponent();
