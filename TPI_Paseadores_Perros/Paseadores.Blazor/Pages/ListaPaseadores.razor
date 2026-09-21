@@ -1,0 +1,76 @@
+﻿@page "/paseadores"
+@using DTOs
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <h2>Listado de Paseadores</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+    else if (listaPaseadores == null)
+    {
+        <div class="alert alert-info">Cargando datos...</div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Zona</th>
+                    <th>Tarifa Por Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var paseador in listaPaseadores)
+                {
+                    <tr>
+                        <td>@paseador.Id</td>
+                        <td>@paseador.Nombre</td>
+                        <td>@paseador.Apellido</td>
+                        <td>@paseador.Email</td>
+                        <td>@paseador.Telefono</td>
+                        <td>@paseador.Zona</td>
+                        <td>@paseador.TarifaPorHora</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<PaseadorDTO> listaPaseadores;
+    private string mensajeError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token_seguridad");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        try
+        {
+            // OJO: Revisá en tu archivo Endpoints si la ruta es "/paseadores" u otra.
+            listaPaseadores = await Http.GetFromJsonAsync<List<PaseadorDTO>>("/paseadores");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Falló la conexión: {ex.Message}";
+        }
+    }
+}

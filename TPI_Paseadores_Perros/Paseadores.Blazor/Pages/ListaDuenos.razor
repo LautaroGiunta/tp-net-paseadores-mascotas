@@ -1,0 +1,76 @@
+﻿@page "/duenos"
+@using DTOs
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+
+<div class="container mt-4">
+    <h2>Listado de Dueños</h2>
+
+    @if (listaDuenos == null)
+    {
+        <div class="alert alert-info">Cargando datos...</div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Direccion</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dueno in listaDuenos)
+                {
+                    <tr>
+                        <td>@dueno.Id</td>
+                        <td>@dueno.Nombre</td>
+                        <td>@dueno.Apellido</td>
+                        <td>@dueno.Email</td>
+                        <td>@dueno.Telefono</td>
+                        <td>@dueno.Direccion</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    // Reemplazá "DuenoDTO" por el nombre exacto de la clase que usen en su proyecto
+    private List<DuenoDTO> listaDuenos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Sacamos el token del bolsillo del navegador
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token_seguridad");
+
+        // 2. Si no hay token, lo pateamos al login por seguridad
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // 3. LA MAGIA: Le pegamos el token al HttpClient.
+        // "Bearer" es el estándar de seguridad que significa "Portador del token"
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        try
+        {
+            // 4. Vamos a buscar los datos a tu API (revisá que la ruta "/api/dueno" sea la correcta)
+            listaDuenos = await Http.GetFromJsonAsync<List<DuenoDTO>>("/duenos");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error al traer los datos: " + ex.Message);
+            // Acá podrías mostrar un cartel de error si el token venció, por ejemplo
+        }
+    }
+}

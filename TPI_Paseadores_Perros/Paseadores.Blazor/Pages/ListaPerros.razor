@@ -1,0 +1,69 @@
+﻿@page "/perros"
+@using DTOs
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<div class="container mt-4">
+    <h2>Listado de Perros</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+    else if (listaPerros == null)
+    {
+        <div class="alert alert-info">Cargando datos...</div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Raza</th>
+                    <!-- Agregá otras si existen, ej: Tamaño, Comportamiento -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var perro in listaPerros)
+                {
+                    <tr>
+                        <td>@perro.Id</td>
+                        <td>@perro.Nombre</td>
+                        <td>@perro.Raza</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<PerroDTO> listaPerros;
+    private string mensajeError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token_seguridad");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        try
+        {
+            // OJO: Revisá en tu archivo Endpoints si la ruta es "/perros".
+            listaPerros = await Http.GetFromJsonAsync<List<PerroDTO>>("/perros");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Falló la conexión: {ex.Message}";
+        }
+    }
+}

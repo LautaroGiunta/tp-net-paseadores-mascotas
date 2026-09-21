@@ -1,7 +1,22 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Inicio</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Panel Principal</h1>
+<p>Bienvenido al sistema de gestión de paseadores.</p>
 
-Welcome to your new app.
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Buscamos el token en el Local Storage
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token_seguridad");
+
+        // 2. Si el token está vacío (no existe), lo mandamos de una al Login
+        if (string.IsNullOrEmpty(token))
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}
