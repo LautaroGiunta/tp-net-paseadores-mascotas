@@ -63,6 +63,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirBlazor", app =>
+    {
+        // Acá ponés exactamente la URL que te muestra el navegador cuando abrís Blazor
+        app.WithOrigins("http://localhost:7202", "https://localhost:7202")
+           .AllowAnyHeader()
+           .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(Politicas.SoloAdmin, politica =>
@@ -114,7 +125,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-
+app.UseCors("PermitirBlazor");
 app.UseAuthentication();
 app.UseAuthorization();
 

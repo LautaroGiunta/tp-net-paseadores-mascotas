@@ -1,0 +1,84 @@
+﻿@page "/login"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@using DTOs
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Iniciar Sesión</h3>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" @bind="loginData.Email" class="form-control" placeholder="admin@admin.com" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Contraseña</label>
+                        <input type="password" @bind="loginData.Contrasena" class="form-control" placeholder="******" />
+                    </div>
+
+                    <button class="btn btn-primary w-100" @onclick="Ingresar">Ingresar</button>
+
+                    @if (!string.IsNullOrEmpty(mensajeError))
+                    {
+                        <div class="alert alert-danger mt-3">@mensajeError</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // Estas clases las definimos acá rápido para mapear los datos,
+    // igual que hicimos con los DTOs en WinForms.
+    private LoginRequestDTO loginData = new LoginRequestDTO();
+    private string mensajeError = "";
+
+    private async Task Ingresar()
+    {
+        mensajeError = "";
+
+        try
+        {
+            // 1. Mandamos el loginData (LoginRequestDTO)
+            var response = await Http.PostAsJsonAsync("/api/auth/login", loginData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // 2. ATENCIÓN ACÁ: Ahora atrapamos el LoginResponseDTO (el paquete completo que armó tu amigo)
+                var respuestaAPI = await response.Content.ReadFromJsonAsync<LoginResponseDTO>();
+
+                if (respuestaAPI != null)
+                {
+                    // 3. Guardamos el Token en el bolsillo del navegador (Local Storage)
+                    await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token_seguridad", respuestaAPI.Token);
+
+                    // Opcional: Si necesitas mostrar el nombre en la pantalla principal, también podes guardarlo
+                    await JSRuntime.InvokeVoidAsync("localStorage.setItem", "usuario_nombre", respuestaAPI.Usuario.Nombre);
+                    await JSRuntime.InvokeVoidAsync("localStorage.setItem", "usuario_rol", respuestaAPI.Usuario.Rol);
+
+                    // 4. Lo pateamos al inicio
+                    Navigation.NavigateTo("/");
+                }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                mensajeError = "Email o contraseña incorrectos.";
+            }
+            else
+            {
+                mensajeError = "Ocurrió un error en el servidor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error de conexión con la API.";
+        }
+    }
+
+}
