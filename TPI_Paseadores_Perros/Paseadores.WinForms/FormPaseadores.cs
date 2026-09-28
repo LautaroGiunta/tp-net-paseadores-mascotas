@@ -78,6 +78,7 @@ namespace Paseadores.WinForms
                 txtTelefono.Clear();
                 txtTarifa.Clear();
                 txtZona.Clear();
+                txtContrasena.Clear();
                 idPaseadorSeleccionado = 0;
                 await CargarPaseadoresAsync();
                 dgvPaseadores.ClearSelection();

@@ -76,6 +76,7 @@ namespace Paseadores.WinForms
                 txtEmail.Clear();
                 txtTelefono.Clear();
                 txtDireccion.Clear();
+                txtContrasena.Clear();
                 idDueñoSeleccionado = 0;
                 await CargarDueñosAsync();
                 dgvDueños.ClearSelection();
