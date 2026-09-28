@@ -36,7 +36,9 @@ namespace Data
 
         public async Task<IEnumerable<Perro>> GetAllAsync()
         {
-            return await _context.Perros.ToListAsync();
+            return await _context.Perros
+                .Include(p => p.Dueno)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateAsync(Perro perro)
@@ -59,6 +61,7 @@ namespace Data
             return await _context.Perros
                 .Where(p => p.DuenoId == duenoId)
                 .OrderBy(p => p.Nombre)
+                .Include(p => p.Dueno)
                 .ToListAsync();
         }
     }

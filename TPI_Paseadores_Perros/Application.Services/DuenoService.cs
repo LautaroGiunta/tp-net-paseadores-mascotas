@@ -83,8 +83,9 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
+            string contrasena = string.IsNullOrWhiteSpace(dto.Contrasena) ? existing.Contrasena : dto.Contrasena;
             Dueno dueno = new Dueno(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
-                                    dto.Telefono, dto.Direccion, dto.Contrasena, existing.FechaAlta);
+                                    dto.Telefono, dto.Direccion, contrasena, existing.FechaAlta);
             return await duenoRepository.UpdateAsync(dueno);
         }
 

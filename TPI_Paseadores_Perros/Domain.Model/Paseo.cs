@@ -9,7 +9,8 @@ namespace Domain.Model
         public int DuracionMinutos { get; private set; }
         public decimal PrecioTotal { get; private set; }
         public DateTime FechaAlta { get; private set; }
-
+        public Paseador? Paseador { get; private set; }
+        public Perro? Perro { get; private set; }
         public Paseo(int id, int paseadorId, int perroId, DateTime fechaHoraInicio,
                      int duracionMinutos, decimal precioTotal, DateTime fechaAlta)
         {

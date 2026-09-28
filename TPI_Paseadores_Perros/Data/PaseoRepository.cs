@@ -38,6 +38,8 @@ namespace Data
         {
             return await _context.Paseos
                 .OrderBy(p => p.FechaHoraInicio)
+                .Include(p => p.Paseador)
+                .Include(p => p.Perro)
                 .ToListAsync();
         }
 
@@ -75,6 +77,8 @@ namespace Data
 
             return await query
                 .OrderBy(p => p.FechaHoraInicio)
+                .Include(p => p.Paseador)
+                .Include(p => p.Perro)
                 .ToListAsync();
         }
 

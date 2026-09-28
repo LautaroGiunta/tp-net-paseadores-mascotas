@@ -1,23 +1,22 @@
-﻿using System;
+﻿using API.Clients;
+using DTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DTOs;
-using System.Net.Http.Json;
 
 namespace Paseadores.WinForms
 {
     public partial class FormPaseadores : Form
     {
-        private static HttpClient client => ApiClient.Http;
         private int idPaseadorSeleccionado = 0;
 
-        private readonly string urlApi = "/paseadores";
         public FormPaseadores()
         {
             InitializeComponent();
@@ -33,9 +32,8 @@ namespace Paseadores.WinForms
         {
             try
             {
-                List<PaseadorDTO> lista = await client.GetFromJsonAsync<List<PaseadorDTO>>(urlApi);
+                List<PaseadorDTO> lista = await ApiClient.Paseadores.GetAllAsync();
                 dgvPaseadores.DataSource = lista;
-
             }
             catch (Exception ex)
             {
@@ -54,46 +52,32 @@ namespace Paseadores.WinForms
                 Telefono = txtTelefono.Text,
                 Email = txtEmail.Text,
                 TarifaPorHora = decimal.Parse(txtTarifa.Text),
-                Zona = txtZona.Text
+                Zona = txtZona.Text,
+                Contrasena = txtContrasena.Text
             };
 
             try
             {
-                HttpResponseMessage response;
-
-                if(idPaseadorSeleccionado == 0)
-                {
-                    response = await client.PostAsJsonAsync(urlApi, nuevoPaseador);
-                }
+                if (idPaseadorSeleccionado == 0)
+                    await ApiClient.Paseadores.AddAsync(nuevoPaseador);
                 else
-                {
-                    response = await client.PutAsJsonAsync(urlApi, nuevoPaseador);
-                }
+                    await ApiClient.Paseadores.UpdateAsync(nuevoPaseador);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("¡Paseador guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("¡Paseador guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    txtNombre.Clear();
-                    txtApellido.Clear();
-                    txtEmail.Clear();
-                    txtTelefono.Clear();
-                    txtTarifa.Clear();
-                    txtZona.Clear();
-                    idPaseadorSeleccionado = 0;
-                    await CargarPaseadoresAsync();
-                    dgvPaseadores.ClearSelection();
-                }
-                else
-                {
-                    // Leemos el mensaje exacto que nos mandó la API con los detalles del error
-                    string errorDetalle = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + errorDetalle, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                txtNombre.Clear();
+                txtApellido.Clear();
+                txtEmail.Clear();
+                txtTelefono.Clear();
+                txtTarifa.Clear();
+                txtZona.Clear();
+                idPaseadorSeleccionado = 0;
+                await CargarPaseadoresAsync();
+                dgvPaseadores.ClearSelection();
             }
-            catch (ArgumentException ex)
+            catch (ApiException ex)
             {
-                MessageBox.Show(ex.Message, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + ex.Message, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
@@ -109,6 +93,7 @@ namespace Paseadores.WinForms
             txtTelefono.Clear();
             txtTarifa.Clear();
             txtZona.Clear();
+            txtContrasena.Clear();
             txtNombre.Focus();
             idPaseadorSeleccionado = 0;
             dgvPaseadores.ClearSelection();
@@ -128,17 +113,14 @@ namespace Paseadores.WinForms
                 try
                 {
                     int idSeleccionado = Convert.ToInt32(dgvPaseadores.CurrentRow.Cells["colId"].Value);
-                    HttpResponseMessage response = await client.DeleteAsync($"{urlApi}/{idSeleccionado}");
+                    await ApiClient.Paseadores.DeleteAsync(idSeleccionado);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Paseador eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        await CargarPaseadoresAsync();
-                    }
-                    else
-                    {
-                        MessageBox.Show("La API rechazó la eliminación. Código: " + response.StatusCode, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Paseador eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarPaseadoresAsync();
+                }
+                catch (ApiException ex)
+                {
+                    MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception ex)
                 {
@@ -159,6 +141,8 @@ namespace Paseadores.WinForms
             txtTelefono.Text = fila.Cells["colTelefono"].Value?.ToString();
             txtTarifa.Text = fila.Cells["colTarifa"].Value?.ToString();
             txtZona.Text = fila.Cells["colZona"].Value?.ToString();
+            txtContrasena.Clear();
         }
+
     }
 }

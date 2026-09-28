@@ -9,5 +9,7 @@ namespace DTOs
         public int DuracionMinutos { get; set; }
         public decimal PrecioTotal { get; set; }
         public DateTime FechaAlta { get; set; }
+        public string PaseadorNombre { get; set; } = string.Empty;  
+        public string PerroNombre { get; set; } = string.Empty;
     }
 }

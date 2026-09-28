@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using API.Clients;
+using System.Net.Http.Headers;
 
 namespace Paseadores.WinForms
 {
@@ -15,7 +16,12 @@ namespace Paseadores.WinForms
         };
 
         public static HttpClient Http => _http;
-
+        // Clientes tipados: comparten el _http, así heredan el token automáticamente
+        public static AuthApiClient Auth { get; } = new AuthApiClient(_http);
+        public static DuenoApiClient Duenos { get; } = new DuenoApiClient(_http);
+        public static PaseadorApiClient Paseadores { get; } = new PaseadorApiClient(_http);
+        public static PerroApiClient Perros { get; } = new PerroApiClient(_http);
+        public static PaseoApiClient Paseos { get; } = new PaseoApiClient(_http);
         public static string Token { get; private set; } = string.Empty;
 
         public static void GuardarToken(string? token)

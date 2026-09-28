@@ -132,7 +132,9 @@ namespace Application.Services
                 FechaHoraInicio = paseo.FechaHoraInicio,
                 DuracionMinutos = paseo.DuracionMinutos,
                 PrecioTotal = paseo.PrecioTotal,
-                FechaAlta = paseo.FechaAlta
+                FechaAlta = paseo.FechaAlta,
+                PaseadorNombre = paseo.Paseador != null ? $"{paseo.Paseador.Apellido}, {paseo.Paseador.Nombre}" : "",
+                PerroNombre = paseo.Perro?.Nombre ?? ""
             };
         }
     }

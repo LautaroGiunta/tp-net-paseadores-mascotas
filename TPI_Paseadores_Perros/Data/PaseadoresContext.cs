@@ -41,19 +41,19 @@ namespace Data
             // Sin propiedades de navegación, las claves foráneas se declaran a mano.
             // Restrict evita que borrar un dueño arrastre a sus perros
             modelBuilder.Entity<Perro>()
-                .HasOne<Dueno>()
+                .HasOne<Dueno>(p => p.Dueno)
                 .WithMany()
                 .HasForeignKey(p => p.DuenoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Paseo>()
-                .HasOne<Paseador>()
+                .HasOne<Paseador>(p => p.Paseador)
                 .WithMany()
                 .HasForeignKey(p => p.PaseadorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Paseo>()
-                .HasOne<Perro>()
+                .HasOne<Perro>(p => p.Perro)
                 .WithMany()
                 .HasForeignKey(p => p.PerroId)
                 .OnDelete(DeleteBehavior.Restrict);

@@ -8,6 +8,7 @@ namespace Domain.Model
         public string Raza { get; private set; }
         public int Edad { get; private set; }
         public DateTime FechaAlta { get; private set; }
+        public Dueno? Dueno { get; private set; }
 
         public Perro(int id, int duenoId, string nombre, string raza,
                      int edad, DateTime fechaAlta)

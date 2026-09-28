@@ -1,4 +1,5 @@
-﻿using DTOs;
+﻿using API.Clients;
+using DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,15 +15,11 @@ namespace Paseadores.WinForms
 {
     public partial class FormPaseos : Form
     {
-        private static HttpClient client => ApiClient.Http;
         private int idPaseoSeleccionado = 0;
         private List<PaseoDTO> paseosCargados = new List<PaseoDTO>();
         private List<PaseadorDTO> paseadores = new List<PaseadorDTO>();
         private List<PerroDTO> perros = new List<PerroDTO>();
 
-        private readonly string urlApi = "/paseos";
-        private readonly string urlPaseadores = "/paseadores";
-        private readonly string urlPerros = "/perros";
 
         public FormPaseos()
         {
@@ -36,7 +33,7 @@ namespace Paseadores.WinForms
             dtpDesde.Value = DateTime.Today;
             dtpHasta.Value = DateTime.Today.AddMonths(1);
             await CargarCombosAsync();
-            await CargarPaseosAsync(urlApi);
+            await CargarPaseosAsync();
         }
 
         // Paseadores y perros se eligen de una lista para no tener que escribir Ids
@@ -44,8 +41,8 @@ namespace Paseadores.WinForms
         {
             try
             {
-                paseadores = await client.GetFromJsonAsync<List<PaseadorDTO>>(urlPaseadores);
-                perros = await client.GetFromJsonAsync<List<PerroDTO>>(urlPerros);
+                paseadores = await ApiClient.Paseadores.GetAllAsync();
+                perros = await ApiClient.Perros.GetAllAsync();
 
                 cmbPaseador.DataSource = paseadores
                     .Select(p => new { p.Id, Descripcion = p.Apellido + ", " + p.Nombre + " (" + p.Zona + ")" })
@@ -76,33 +73,31 @@ namespace Paseadores.WinForms
             }
         }
 
-        private async Task CargarPaseosAsync(string url)
+        private async Task CargarPaseosAsync()
         {
             try
             {
-                paseosCargados = await client.GetFromJsonAsync<List<PaseoDTO>>(url);
-
-                // Se arma una lista para mostrar nombres en vez de Ids
-                dgvPaseos.DataSource = paseosCargados.Select(p => new
-                {
-                    p.Id,
-                    Paseador = paseadores.Where(x => x.Id == p.PaseadorId)
-                                         .Select(x => x.Apellido + ", " + x.Nombre)
-                                         .FirstOrDefault() ?? "",
-                    Perro = perros.Where(x => x.Id == p.PerroId)
-                                  .Select(x => x.Nombre)
-                                  .FirstOrDefault() ?? "",
-                    Inicio = p.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
-                    Fin = p.FechaHoraInicio.AddMinutes(p.DuracionMinutos).ToString("HH:mm"),
-                    p.DuracionMinutos,
-                    p.PrecioTotal
-                }).ToList();
+                paseosCargados = await ApiClient.Paseos.GetAllAsync();
+                MostrarPaseos();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("No se pudo conectar con la API. ¿Está encendida?\n\nError: " + ex.Message,
                     "Error de conexión", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        private void MostrarPaseos()
+        {
+            dgvPaseos.DataSource = paseosCargados.Select(p => new
+            {
+                p.Id,
+                Paseador = p.PaseadorNombre,
+                Perro = p.PerroNombre,
+                Inicio = p.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm"),
+                Fin = p.FechaHoraInicio.AddMinutes(p.DuracionMinutos).ToString("HH:mm"),
+                p.DuracionMinutos,
+                p.PrecioTotal
+            }).ToList();
         }
 
         private async void btnGuardar_Click(object sender, EventArgs e)
@@ -125,30 +120,19 @@ namespace Paseadores.WinForms
 
             try
             {
-                HttpResponseMessage response;
-
                 if (idPaseoSeleccionado == 0)
-                {
-                    response = await client.PostAsJsonAsync(urlApi, nuevoPaseo);
-                }
+                    await ApiClient.Paseos.AddAsync(nuevoPaseo);
                 else
-                {
-                    response = await client.PutAsJsonAsync(urlApi, nuevoPaseo);
-                }
+                    await ApiClient.Paseos.UpdateAsync(nuevoPaseo);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("¡Paseo guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarFormulario();
-                    await CargarPaseosAsync(urlApi);
-                    dgvPaseos.ClearSelection();
-                }
-                else
-                {
-                    // Leemos el mensaje exacto que nos mandó la API con los detalles del error
-                    string errorDetalle = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + errorDetalle, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                MessageBox.Show("¡Paseo guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LimpiarFormulario();
+                await CargarPaseosAsync();
+                dgvPaseos.ClearSelection();
+            }
+            catch (ApiException ex)
+            {
+                MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + ex.Message, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
@@ -186,19 +170,15 @@ namespace Paseadores.WinForms
                 try
                 {
                     int idSeleccionado = Convert.ToInt32(dgvPaseos.CurrentRow.Cells["colId"].Value);
-                    HttpResponseMessage response = await client.DeleteAsync($"{urlApi}/{idSeleccionado}");
+                    await ApiClient.Paseos.DeleteAsync(idSeleccionado);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Paseo eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LimpiarFormulario();
-                        await CargarPaseosAsync(urlApi);
-                    }
-                    else
-                    {
-                        string errorDetalle = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + errorDetalle, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Paseo eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LimpiarFormulario();
+                    await CargarPaseosAsync();
+                }
+                catch (ApiException ex)
+                {
+                    MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception ex)
                 {
@@ -210,26 +190,29 @@ namespace Paseadores.WinForms
         // Busqueda por criterio: arma el query string solo con los filtros cargados
         private async void btnBuscar_Click(object sender, EventArgs e)
         {
-            var filtros = new List<string>();
-
-            if (cmbFiltroPaseador.SelectedValue != null)
-                filtros.Add("paseadorId=" + Convert.ToInt32(cmbFiltroPaseador.SelectedValue));
-
-            if (chkFiltrarFechas.Checked)
+            try
             {
-                filtros.Add("fechaDesde=" + dtpDesde.Value.Date.ToString("yyyy-MM-ddTHH:mm:ss"));
-                filtros.Add("fechaHasta=" + dtpHasta.Value.Date.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ss"));
-            }
+                int? paseadorId = cmbFiltroPaseador.SelectedValue != null
+                    ? Convert.ToInt32(cmbFiltroPaseador.SelectedValue) : (int?)null;
 
-            string url = urlApi + "/buscar?" + string.Join("&", filtros);
-            await CargarPaseosAsync(url);
+                DateTime? desde = chkFiltrarFechas.Checked ? dtpDesde.Value.Date : (DateTime?)null;
+                DateTime? hasta = chkFiltrarFechas.Checked
+                    ? dtpHasta.Value.Date.AddDays(1).AddSeconds(-1) : (DateTime?)null;
+
+                paseosCargados = await ApiClient.Paseos.BuscarAsync(paseadorId, desde, hasta);
+                MostrarPaseos();
+            }
+            catch (ApiException ex)
+            {
+                MessageBox.Show("Error en la búsqueda: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private async void btnVerTodos_Click(object sender, EventArgs e)
         {
             cmbFiltroPaseador.SelectedIndex = -1;
             chkFiltrarFechas.Checked = false;
-            await CargarPaseosAsync(urlApi);
+            await CargarPaseosAsync();
         }
 
         private void dgvPaseos_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

@@ -1,4 +1,4 @@
-ï»¿using Data;
+using Data;
 using Domain.Model;
 using DTOs;
 using System.Text.RegularExpressions;
@@ -18,17 +18,17 @@ namespace Application.Services
 
         public async Task<PaseadorDTO> AddAsync(PaseadorDTO dto)
         {
-            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            // Validar que el telÃ©fono solo tenga nÃºmeros y una longitud lÃ³gica (ej: entre 8 y 15 dÃ­gitos)
             if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
             {
-                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+                throw new ArgumentException("El formato del telÃ©fono es invÃ¡lido. Debe contener entre 8 y 15 nÃºmeros, sin espacios ni letras.");
             }
             // Regla de negocio: el email no puede estar duplicado
             if (await paseadorRepository.EmailExistsAsync(dto.Email))
             {
                 throw new ArgumentException($"Ya existe un paseador con el email '{dto.Email}'.");
             }
-            // Validar que la tarifa sea un valor lógico
+            // Validar que la tarifa sea un valor lÃ³gico
             if (dto.TarifaPorHora <= 0)
             {
                 throw new ArgumentException("La tarifa por hora debe ser mayor a cero.");
@@ -71,10 +71,10 @@ namespace Application.Services
 
         public async Task<bool> UpdateAsync(PaseadorDTO dto)
         {
-            // Validar que el teléfono solo tenga números y una longitud lógica (ej: entre 8 y 15 dígitos)
+            // Validar que el telÃ©fono solo tenga nÃºmeros y una longitud lÃ³gica (ej: entre 8 y 15 dÃ­gitos)
             if (!Regex.IsMatch(dto.Telefono, @"^[0-9]{8,15}$"))
             {
-                throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
+                throw new ArgumentException("El formato del telÃ©fono es invÃ¡lido. Debe contener entre 8 y 15 nÃºmeros, sin espacios ni letras.");
             }
 
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio paseador)
@@ -82,7 +82,7 @@ namespace Application.Services
             {
                 throw new ArgumentException($"Ya existe otro paseador con el email '{dto.Email}'.");
             }
-            // Validar que la tarifa sea un valor lógico
+            // Validar que la tarifa sea un valor lÃ³gico
             if (dto.TarifaPorHora <= 0)
             {
                 throw new ArgumentException("La tarifa por hora debe ser mayor a cero.");
@@ -93,8 +93,9 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
+            string contrasena = string.IsNullOrWhiteSpace(dto.Contrasena) ? existing.Contrasena : dto.Contrasena;
             Paseador paseador = new Paseador(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
-                                             dto.Telefono, dto.Zona, dto.TarifaPorHora, dto.Contrasena, existing.FechaAlta);
+                                             dto.Telefono, dto.Zona, dto.TarifaPorHora, contrasena, existing.FechaAlta);
             return await paseadorRepository.UpdateAsync(paseador);
         }
 
@@ -116,7 +117,7 @@ namespace Application.Services
                 Telefono = paseador.Telefono,
                 Zona = paseador.Zona,
                 TarifaPorHora = paseador.TarifaPorHora,
-                // La contraseÃ±a no se devuelve
+                // La contraseÃƒÂ±a no se devuelve
                 Rol = paseador.Rol.ToString(),
                 FechaAlta = paseador.FechaAlta
             };

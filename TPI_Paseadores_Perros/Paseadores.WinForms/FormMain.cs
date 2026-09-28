@@ -48,6 +48,12 @@ namespace Paseadores.WinForms
 
         private void paseadoresToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var existente = this.MdiChildren.OfType<FormPaseadores>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
             FormPaseadores ventanaPaseadores = new FormPaseadores();
             ventanaPaseadores.MdiParent = this;
             ventanaPaseadores.Show();
@@ -55,6 +61,12 @@ namespace Paseadores.WinForms
 
         private void dueñosToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var existente = this.MdiChildren.OfType<FormDueños>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
             FormDueños ventanaDueños = new FormDueños();
             ventanaDueños.MdiParent = this;
             ventanaDueños.Show();
@@ -62,6 +74,12 @@ namespace Paseadores.WinForms
 
         private void perrosToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var existente = this.MdiChildren.OfType<FormPerros>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
             FormPerros ventanaPerros = new FormPerros();
             ventanaPerros.MdiParent = this;
             ventanaPerros.Show();
@@ -69,6 +87,12 @@ namespace Paseadores.WinForms
 
         private void paseosToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var existente = this.MdiChildren.OfType<FormPaseos>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
             FormPaseos ventanaPaseos = new FormPaseos();
             ventanaPaseos.MdiParent = this;
             ventanaPaseos.Show();

@@ -1,4 +1,5 @@
-﻿using DTOs;
+﻿using API.Clients;
+using DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,9 +15,7 @@ namespace Paseadores.WinForms
 {
     public partial class FormDueños : Form
     {
-        private static HttpClient client => ApiClient.Http;
         int idDueñoSeleccionado = 0;
-        private readonly string urlApi = "/duenos";
         public FormDueños()
         {
             InitializeComponent();
@@ -32,7 +31,7 @@ namespace Paseadores.WinForms
         {
             try
             {
-                List<DuenoDTO> lista = await client.GetFromJsonAsync<List<DuenoDTO>>(urlApi);
+                List<DuenoDTO> lista = await ApiClient.Duenos.GetAllAsync();
                 dgvDueños.DataSource = lista;
 
             }
@@ -53,35 +52,30 @@ namespace Paseadores.WinForms
                 Apellido = txtApellido.Text,
                 Telefono = txtTelefono.Text,
                 Email = txtEmail.Text,
-                Direccion = txtDireccion.Text
+                Direccion = txtDireccion.Text,
+                Contrasena = txtContrasena.Text
             };
             try
             {
-                HttpResponseMessage response;
                 if (idDueñoSeleccionado == 0)
-                {
-                    response = await client.PostAsJsonAsync(urlApi, nuevoDueño);
-                }
+                    await ApiClient.Duenos.AddAsync(nuevoDueño);
                 else
-                {
-                    response = await client.PutAsJsonAsync(urlApi, nuevoDueño);
-                }
-                if (response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("¡Dueño guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await ApiClient.Duenos.UpdateAsync(nuevoDueño);
 
-                    txtNombre.Clear();
-                    txtApellido.Clear();
-                    txtEmail.Clear();
-                    txtTelefono.Clear();
-                    txtDireccion.Clear();
-                    idDueñoSeleccionado = 0;
-                    await CargarDueñosAsync();
-                    dgvDueños.ClearSelection();
-                }
+                MessageBox.Show("¡Dueño guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                txtNombre.Clear();
+                txtApellido.Clear();
+                txtEmail.Clear();
+                txtTelefono.Clear();
+                txtDireccion.Clear();
+                idDueñoSeleccionado = 0;
+                await CargarDueñosAsync();
+                dgvDueños.ClearSelection();
             }
-            catch (ArgumentException ex)
+            catch (ApiException ex)
             {
+                // Ahora SÍ se ve el rechazo de la API (antes se perdía por el if sin else)
                 MessageBox.Show(ex.Message, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
@@ -96,6 +90,7 @@ namespace Paseadores.WinForms
             txtEmail.Clear();
             txtTelefono.Clear();
             txtDireccion.Clear();
+            txtContrasena.Clear();
             txtNombre.Focus();
             idDueñoSeleccionado = 0;
             dgvDueños.ClearSelection();
@@ -115,17 +110,14 @@ namespace Paseadores.WinForms
                 try
                 {
                     int idSeleccionado = Convert.ToInt32(dgvDueños.CurrentRow.Cells["colId"].Value);
-                    HttpResponseMessage response = await client.DeleteAsync($"{urlApi}/{idSeleccionado}");
+                    await ApiClient.Duenos.DeleteAsync(idSeleccionado);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Dueño eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        await CargarDueñosAsync();
-                    }
-                    else
-                    {
-                        MessageBox.Show("La API rechazó la eliminación. Código: " + response.StatusCode, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Dueño eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarDueñosAsync();
+                }
+                catch (ApiException ex)
+                {
+                    MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception ex)
                 {
@@ -146,6 +138,7 @@ namespace Paseadores.WinForms
             txtEmail.Text = fila.Cells["colEmail"].Value?.ToString();
             txtTelefono.Text = fila.Cells["colTelefono"].Value?.ToString();
             txtDireccion.Text = fila.Cells["colDireccion"].Value?.ToString();
+            txtContrasena.Clear();
         }
     }
 }

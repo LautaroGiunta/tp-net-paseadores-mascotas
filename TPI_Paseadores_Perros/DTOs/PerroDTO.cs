@@ -8,5 +8,6 @@ namespace DTOs
         public string Raza { get; set; } = string.Empty;
         public int Edad { get; set; }
         public DateTime FechaAlta { get; set; }
+        public string DuenoNombre { get; set; } = string.Empty;
     }
 }

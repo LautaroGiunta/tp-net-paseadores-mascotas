@@ -93,7 +93,8 @@ namespace Application.Services
                 Nombre = perro.Nombre,
                 Raza = perro.Raza,
                 Edad = perro.Edad,
-                FechaAlta = perro.FechaAlta
+                FechaAlta = perro.FechaAlta,
+                DuenoNombre = perro.Dueno != null ? $"{perro.Dueno.Apellido}, {perro.Dueno.Nombre}" : ""
             };
         }
     }

@@ -1,4 +1,5 @@
-﻿using DTOs;
+﻿using API.Clients;
+using DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,12 +15,9 @@ namespace Paseadores.WinForms
 {
     public partial class FormPerros : Form
     {
-        private static HttpClient client => ApiClient.Http;
         private int idPerroSeleccionado = 0;
         private List<PerroDTO> perrosCargados = new List<PerroDTO>();
 
-        private readonly string urlApi = "/perros";
-        private readonly string urlDuenos = "/duenos";
 
         public FormPerros()
         {
@@ -38,7 +36,7 @@ namespace Paseadores.WinForms
         {
             try
             {
-                List<DuenoDTO> duenos = await client.GetFromJsonAsync<List<DuenoDTO>>(urlDuenos);
+                List<DuenoDTO> duenos = await ApiClient.Duenos.GetAllAsync();
                 cmbDueno.DataSource = duenos
                     .Select(d => new { d.Id, Descripcion = d.Apellido + ", " + d.Nombre })
                     .ToList();
@@ -57,16 +55,12 @@ namespace Paseadores.WinForms
         {
             try
             {
-                perrosCargados = await client.GetFromJsonAsync<List<PerroDTO>>(urlApi);
-                List<DuenoDTO> duenos = await client.GetFromJsonAsync<List<DuenoDTO>>(urlDuenos);
+                perrosCargados = await ApiClient.Perros.GetAllAsync();
 
-                // Se arma una lista para mostrar el nombre del dueño en vez del Id
                 dgvPerros.DataSource = perrosCargados.Select(p => new
                 {
                     p.Id,
-                    Dueno = duenos.Where(d => d.Id == p.DuenoId)
-                                  .Select(d => d.Apellido + ", " + d.Nombre)
-                                  .FirstOrDefault() ?? "",
+                    Dueno = p.DuenoNombre,
                     p.Nombre,
                     p.Raza,
                     p.Edad
@@ -98,30 +92,20 @@ namespace Paseadores.WinForms
 
             try
             {
-                HttpResponseMessage response;
-
                 if (idPerroSeleccionado == 0)
-                {
-                    response = await client.PostAsJsonAsync(urlApi, nuevoPerro);
-                }
+                    await ApiClient.Perros.AddAsync(nuevoPerro);
                 else
-                {
-                    response = await client.PutAsJsonAsync(urlApi, nuevoPerro);
-                }
+                    await ApiClient.Perros.UpdateAsync(nuevoPerro);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("¡Perro guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarFormulario();
-                    await CargarPerrosAsync();
-                    dgvPerros.ClearSelection();
-                }
-                else
-                {
-                    // Leemos el mensaje exacto que nos mandó la API con los detalles del error
-                    string errorDetalle = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + errorDetalle, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                MessageBox.Show("¡Perro guardado con éxito!", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LimpiarFormulario();
+                await CargarPerrosAsync();
+                dgvPerros.ClearSelection();
+            }
+            catch (ApiException ex)
+            {
+                // La API rechazó el guardado (validación, etc.) con su mensaje real
+                MessageBox.Show("La API rechazó el guardado.\n\nDetalles:\n" + ex.Message, "Error de Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
@@ -160,19 +144,15 @@ namespace Paseadores.WinForms
                 try
                 {
                     int idSeleccionado = Convert.ToInt32(dgvPerros.CurrentRow.Cells["colId"].Value);
-                    HttpResponseMessage response = await client.DeleteAsync($"{urlApi}/{idSeleccionado}");
+                    await ApiClient.Perros.DeleteAsync(idSeleccionado);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Perro eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LimpiarFormulario();
-                        await CargarPerrosAsync();
-                    }
-                    else
-                    {
-                        string errorDetalle = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + errorDetalle, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    MessageBox.Show("Perro eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LimpiarFormulario();
+                    await CargarPerrosAsync();
+                }
+                catch (ApiException ex)
+                {
+                    MessageBox.Show("La API rechazó la eliminación.\n\nDetalles:\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception ex)
                 {
