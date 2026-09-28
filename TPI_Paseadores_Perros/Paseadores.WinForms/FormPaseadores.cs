@@ -44,6 +44,13 @@ namespace Paseadores.WinForms
 
         private async void btnGuardar_Click(object sender, EventArgs e)
         {
+            if (idPaseadorSeleccionado == 0 && txtContrasena.Text.Length < 8)
+            {
+                MessageBox.Show("La contraseña debe tener al menos 8 caracteres.",
+                    "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtContrasena.Focus();
+                return;
+            }
             var nuevoPaseador = new PaseadorDTO
             {
                 Id = idPaseadorSeleccionado,
