@@ -51,6 +51,7 @@ namespace Data
                 existing.SetTelefono(paseador.Telefono);
                 existing.SetZona(paseador.Zona);
                 existing.SetTarifaPorHora(paseador.TarifaPorHora);
+                existing.SetContrasena(paseador.Contrasena);
                 await _context.SaveChangesAsync();
                 return true;
             }

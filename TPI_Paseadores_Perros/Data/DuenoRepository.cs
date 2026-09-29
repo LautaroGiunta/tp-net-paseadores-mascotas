@@ -49,6 +49,7 @@ namespace Data
                 existing.SetEmail(dueno.Email);
                 existing.SetTelefono(dueno.Telefono);
                 existing.SetDireccion(dueno.Direccion);
+                existing.SetContrasena(dueno.Contrasena);
                 await _context.SaveChangesAsync();
                 return true;
             }
