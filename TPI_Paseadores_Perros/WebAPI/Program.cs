@@ -115,6 +115,10 @@ builder.Services.AddScoped<IPaseoService, PaseoService>();
 builder.Services.AddScoped<ILiquidacionRepository, LiquidacionRepository>();
 builder.Services.AddScoped<ILiquidacionService, LiquidacionService>();
 
+// Inyección de dependencias - Reportes (ADO.NET)
+builder.Services.AddScoped<IReporteRepository, ReporteRepository>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -143,6 +147,7 @@ app.MapDuenoEndpoints();
 app.MapPerroEndpoints();
 app.MapPaseoEndpoints();
 app.MapLiquidacionEndpoints();
+app.MapReporteEndpoints();
 app.MapAuthEndpoints();
 app.MapAdministradorEndpoints();
 
