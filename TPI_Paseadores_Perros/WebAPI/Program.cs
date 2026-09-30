@@ -125,6 +125,9 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<Data.PaseadoresContext>();
     context.Database.Migrate();
 
+    // Solo si la base no tiene perros ni paseos (ver Data/DatosDePrueba.cs)
+    DatosDePrueba.CargarSiHaceFalta(context);
+
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
