@@ -21,6 +21,31 @@ usuarios, sembrados por la migracion SeedUsuariosIniciales:
 
 El menu de la pantalla principal se habilita segun el rol del usuario que inicia sesion.
 
+### Datos de prueba
+
+Al arrancar, la WebAPI tambien carga datos de prueba (`Data/DatosDePrueba.cs`), **solo si la
+base no tiene perros ni paseos** (asi no se mezclan con datos cargados a mano). Para
+regenerarlos desde cero, borrar la base `PaseadoresDB` y volver a levantar la API.
+
+- 3 duenos mas (`martin.lopez`, `lucia.fernandez`, `jorge.perez` `@paseos.com`, contrasena `Dueno123`)
+- 2 paseadores mas (`sofia.martinez`, `diego.suarez` `@paseos.com`, contrasena `Paseo123`)
+- 7 perros repartidos entre los duenos
+- Paseos de los ultimos 3 meses y de las proximas 2 semanas (las fechas son relativas al dia
+  en que se carga, asi siempre hay paseos hechos y agendados)
+- Liquidaciones de los meses anteriores al mes pasado; el mes pasado y el actual quedan
+  pendientes para poder mostrar el alta de una liquidacion
+
+## Reportes
+
+Los dos reportes se consultan con **ADO.NET** (`Data/ReporteRepository.cs`: `SqlConnection`,
+`SqlCommand` con parametros y `SqlDataReader`) y estan en escritorio (menu *Reportes*) y en web.
+Solo los ve el Admin.
+
+| Reporte | Contenido |
+|---------|-----------|
+| Recaudacion mensual por paseador | Grafico de barras agrupadas por mes + tabla. En escritorio usa ScottPlot; en web, Chart.js (incluido en `wwwroot/lib`, no necesita internet). |
+| Actividad por perro | Tabla con paseos, minutos, gasto y ultimo paseo de cada perro en el periodo (incluye los que no salieron). |
+
 ## Seguridad (autenticacion con token)
 
 El login (`POST /api/auth/login`) devuelve un token JWT junto con los datos del usuario:
@@ -45,6 +70,9 @@ seccion `Jwt` del `appsettings.json` de la WebAPI. El token dura 120 minutos.
 | Alta/baja/modificacion de Paseadores| si    | no    | no       |
 | Alta/baja/modificacion de Perros    | si    | si    | no       |
 | Alta/baja/modificacion de Paseos    | si    | si    | si       |
+| Administradores (todo, incluso GET) | si    | no    | no       |
+| Liquidaciones (todo, incluso GET)   | si    | no    | no       |
+| Reportes                            | si    | no    | no       |
 
 El menu de la pantalla principal de escritorio esconde lo mismo que la API bloquea.
 
