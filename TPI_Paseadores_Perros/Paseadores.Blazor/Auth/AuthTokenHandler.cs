@@ -15,7 +15,7 @@ namespace Paseadores.Blazor.Auth
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = await _js.InvokeAsync<string?>("localStorage.getItem", "token_seguridad");
+            var token = await _js.InvokeAsync<string?>("localStorage.getItem", SesionService.ClaveToken);
 
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

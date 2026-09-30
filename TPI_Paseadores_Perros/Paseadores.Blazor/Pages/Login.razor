@@ -3,7 +3,7 @@
 @using API.Clients
 @inject AuthApiClient AuthApi
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
+@inject SesionService Sesion
 
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -41,6 +41,15 @@
     private string? mensajeError;
     private bool ingresando;
 
+    // Llegar al login (a mano o por un 401 de token vencido) cierra la sesión anterior
+    protected override async Task OnInitializedAsync()
+    {
+        if (Sesion.EstaLogueado)
+        {
+            await Sesion.CerrarAsync();
+        }
+    }
+
     private async Task Ingresar()
     {
         mensajeError = null;
@@ -64,10 +73,8 @@
                 return;
             }
 
-            // El AuthTokenHandler lee esta misma clave en cada llamada posterior
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "token_seguridad", respuesta.Token);
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "usuario_nombre", respuesta.Usuario.Nombre);
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "usuario_rol", respuesta.Usuario.Rol);
+            // Guarda el token (lo usa el AuthTokenHandler) y avisa al menú el rol
+            await Sesion.IniciarAsync(respuesta);
 
             Navigation.NavigateTo("/");
         }

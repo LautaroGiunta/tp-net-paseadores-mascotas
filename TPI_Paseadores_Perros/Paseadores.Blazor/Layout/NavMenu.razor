@@ -1,6 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject SesionService Sesion
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Paseadores.Blazor</a>
+        <a class="navbar-brand" href="">Paseadores de Perros</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -15,23 +16,57 @@
             </NavLink>
         </div>
 
+        @* El menú se recorta según el rol, igual que en escritorio y que las políticas de la WebAPI *@
+        @if (Sesion.EsAdmin)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="duenos">
+                    <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Dueños
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="paseadores">
+                    <span class="bi bi-person-walking-nav-menu" aria-hidden="true"></span> Paseadores
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="administradores">
+                    <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Administradores
+                </NavLink>
+            </div>
+        }
+
+        @if (Sesion.EsAdmin || Sesion.EsDueno)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="perros">
+                    <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span> Perros
+                </NavLink>
+            </div>
+        }
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="duenos">
-                <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Dueños
+            <NavLink class="nav-link" href="paseos">
+                <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span> Paseos
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="paseadores">
-                <span class="bi bi-person-walking-nav-menu" aria-hidden="true"></span> Paseadores
-            </NavLink>
-        </div>
+        @if (Sesion.EsAdmin)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="reportes/recaudacion">
+                    <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span> Recaudación mensual
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="perros">
-                <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span> Perros
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="reportes/actividad">
+                    <span class="bi bi-list-check-nav-menu" aria-hidden="true"></span> Actividad por perro
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 

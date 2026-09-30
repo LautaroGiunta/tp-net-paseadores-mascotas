@@ -1,16 +1,71 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject SesionService Sesion
+@inject NavigationManager Navigation
+
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if (Sesion.EstaLogueado)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+        @if (Sesion.EstaLogueado)
+        {
+            <div class="top-row px-4">
+                <span>@Sesion.Nombre (@Sesion.Rol)</span>
+                <button class="btn btn-link" @onclick="CerrarSesion">Cerrar sesión</button>
+            </div>
+        }
 
         <article class="content px-4">
-            @Body
+            @if (sesionCargada)
+            {
+                @Body
+            }
         </article>
     </main>
 </div>
+
+@code {
+    private bool sesionCargada;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Sesion.CargarAsync();
+        sesionCargada = true;
+
+        Sesion.OnChange += StateHasChanged;
+        Navigation.LocationChanged += AlCambiarDeRuta;
+        ExigirSesion();
+    }
+
+    // Todas las páginas menos el login necesitan sesión iniciada
+    private void ExigirSesion()
+    {
+        var ruta = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (!Sesion.EstaLogueado && !ruta.StartsWith("login", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+
+    private void AlCambiarDeRuta(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        ExigirSesion();
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Sesion.CerrarAsync();
+        Navigation.NavigateTo("/login");
+    }
+
+    public void Dispose()
+    {
+        Sesion.OnChange -= StateHasChanged;
+        Navigation.LocationChanged -= AlCambiarDeRuta;
+    }
+}
