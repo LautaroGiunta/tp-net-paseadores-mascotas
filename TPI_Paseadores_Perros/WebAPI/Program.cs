@@ -91,6 +91,10 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Inyección de dependencias - Administrador
+builder.Services.AddScoped<IAdministradorRepository, AdministradorRepository>();
+builder.Services.AddScoped<IAdministradorService, AdministradorService>();
+
 // Inyección de dependencias - Paseador
 builder.Services.AddScoped<IPaseadorRepository, PaseadorRepository>();
 builder.Services.AddScoped<IPaseadorService, PaseadorService>();
@@ -140,5 +144,6 @@ app.MapPerroEndpoints();
 app.MapPaseoEndpoints();
 app.MapLiquidacionEndpoints();
 app.MapAuthEndpoints();
+app.MapAdministradorEndpoints();
 
 app.Run();
