@@ -9,13 +9,15 @@ namespace Application.Services
         private readonly IPaseoRepository paseoRepository;
         private readonly IPaseadorRepository paseadorRepository;
         private readonly IPerroRepository perroRepository;
+        private readonly ILiquidacionRepository liquidacionRepository;
 
         public PaseoService(IPaseoRepository paseoRepository, IPaseadorRepository paseadorRepository,
-                            IPerroRepository perroRepository)
+                            IPerroRepository perroRepository, ILiquidacionRepository liquidacionRepository)
         {
             this.paseoRepository = paseoRepository;
             this.paseadorRepository = paseadorRepository;
             this.perroRepository = perroRepository;
+            this.liquidacionRepository = liquidacionRepository;
         }
 
         public async Task<PaseoDTO> AddAsync(PaseoDTO dto)
@@ -36,7 +38,7 @@ namespace Application.Services
             }
 
             // El precio no lo carga el usuario: se calcula con la tarifa vigente y queda congelado
-            decimal precioTotal = CalcularPrecio(paseador.TarifaPorHora, dto.DuracionMinutos);
+            decimal precioTotal = paseador.CalcularPrecio(dto.DuracionMinutos);
 
             var fechaAlta = DateTime.Now;
             Paseo paseo = new Paseo(0, dto.PaseadorId, dto.PerroId, dto.FechaHoraInicio,
@@ -49,6 +51,7 @@ namespace Application.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
+            await ValidarNoLiquidadoAsync(id);
             return await paseoRepository.DeleteAsync(id);
         }
 
@@ -70,6 +73,7 @@ namespace Application.Services
 
         public async Task<bool> UpdateAsync(PaseoDTO dto)
         {
+            await ValidarNoLiquidadoAsync(dto.Id);
             Paseador paseador = await ValidarPaseadorAsync(dto.PaseadorId);
             await ValidarPerroAsync(dto.PerroId);
 
@@ -84,7 +88,7 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
-            decimal precioTotal = CalcularPrecio(paseador.TarifaPorHora, dto.DuracionMinutos);
+            decimal precioTotal = paseador.CalcularPrecio(dto.DuracionMinutos);
 
             Paseo paseo = new Paseo(dto.Id, dto.PaseadorId, dto.PerroId, dto.FechaHoraInicio,
                                     dto.DuracionMinutos, precioTotal, existing.FechaAlta);
@@ -117,12 +121,16 @@ namespace Application.Services
             }
         }
 
-        private static decimal CalcularPrecio(decimal tarifaPorHora, int duracionMinutos)
+        // Regla de negocio: un paseo que ya se le pagó al paseador queda cerrado
+        private async Task ValidarNoLiquidadoAsync(int paseoId)
         {
-            return Math.Round(tarifaPorHora * duracionMinutos / 60m, 2);
+            if (await liquidacionRepository.PaseoEstaLiquidadoAsync(paseoId))
+            {
+                throw new ArgumentException("El paseo ya está incluido en una liquidación, no se puede modificar ni eliminar.");
+            }
         }
 
-        private static PaseoDTO MapToDTO(Paseo paseo)
+        internal static PaseoDTO MapToDTO(Paseo paseo)
         {
             return new PaseoDTO
             {

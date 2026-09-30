@@ -19,6 +19,8 @@ namespace Data
         public DbSet<Dueno> Duenos { get; set; }
         public DbSet<Perro> Perros { get; set; }
         public DbSet<Paseo> Paseos { get; set; }
+        public DbSet<Liquidacion> Liquidaciones { get; set; }
+        public DbSet<LiquidacionDetalle> LiquidacionDetalles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,6 +59,35 @@ namespace Data
                 .WithMany()
                 .HasForeignKey(p => p.PerroId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Maestro/Detalle: las líneas se borran con su liquidación (Cascade),
+            // pero un paseo ya liquidado no se puede borrar (Restrict)
+            modelBuilder.Entity<Liquidacion>()
+                .HasOne<Paseador>(l => l.Paseador)
+                .WithMany()
+                .HasForeignKey(l => l.PaseadorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Liquidacion>()
+                .HasMany(l => l.Detalles)
+                .WithOne()
+                .HasForeignKey(d => d.LiquidacionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LiquidacionDetalle>()
+                .Property(d => d.Importe)
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<LiquidacionDetalle>()
+                .HasOne<Paseo>(d => d.Paseo)
+                .WithMany()
+                .HasForeignKey(d => d.PaseoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Un paseo se paga una sola vez
+            modelBuilder.Entity<LiquidacionDetalle>()
+                .HasIndex(d => d.PaseoId)
+                .IsUnique();
 
             SeedUsuarios(modelBuilder);
         }

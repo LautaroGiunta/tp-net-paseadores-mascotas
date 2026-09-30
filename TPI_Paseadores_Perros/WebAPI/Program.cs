@@ -107,6 +107,10 @@ builder.Services.AddScoped<IPerroService, PerroService>();
 builder.Services.AddScoped<IPaseoRepository, PaseoRepository>();
 builder.Services.AddScoped<IPaseoService, PaseoService>();
 
+// Inyección de dependencias - Liquidación (Maestro/Detalle)
+builder.Services.AddScoped<ILiquidacionRepository, LiquidacionRepository>();
+builder.Services.AddScoped<ILiquidacionService, LiquidacionService>();
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -134,6 +138,7 @@ app.MapPaseadorEndpoints();
 app.MapDuenoEndpoints();
 app.MapPerroEndpoints();
 app.MapPaseoEndpoints();
+app.MapLiquidacionEndpoints();
 app.MapAuthEndpoints();
 
 app.Run();

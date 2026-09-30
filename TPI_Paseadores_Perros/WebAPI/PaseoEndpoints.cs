@@ -105,19 +105,27 @@ namespace WebAPI
 
             app.MapDelete("/paseos/{id}", async (int id, IPaseoService paseoService) =>
             {
-                var deleted = await paseoService.DeleteAsync(id);
-
-                if (!deleted)
+                try
                 {
-                    return Results.NotFound();
-                }
+                    var deleted = await paseoService.DeleteAsync(id);
 
-                return Results.NoContent();
+                    if (!deleted)
+                    {
+                        return Results.NotFound();
+                    }
+
+                    return Results.NoContent();
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
             })
             .WithName("DeletePaseo")
             .RequireAuthorization(Politicas.GestionDePaseos)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
         }
     }

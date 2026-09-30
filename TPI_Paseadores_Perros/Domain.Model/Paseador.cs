@@ -29,5 +29,11 @@ namespace Domain.Model
             TarifaPorHora = tarifaPorHora;
         }
 
+        // Lo que cobra por un paseo de esa duración con la tarifa vigente
+        public decimal CalcularPrecio(int duracionMinutos)
+        {
+            return Math.Round(TarifaPorHora * duracionMinutos / 60m, 2);
+        }
+
     }
 }
