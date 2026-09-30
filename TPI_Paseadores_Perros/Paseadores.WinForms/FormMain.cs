@@ -30,6 +30,9 @@ namespace Paseadores.WinForms
                 // Un dueño administra sus perros y sus paseos, no a los demás usuarios
                 dueñosToolStripMenuItem.Visible = false;
                 paseadoresToolStripMenuItem.Visible = false;
+                liquidacionesToolStripMenuItem.Visible = false;
+                reportesToolStripMenuItem.Visible = false;
+                administradoresToolStripMenuItem.Visible = false;
             }
             else if (_usuarioActual.Rol == "Paseador")
             {
@@ -37,6 +40,9 @@ namespace Paseadores.WinForms
                 dueñosToolStripMenuItem.Visible = false;
                 paseadoresToolStripMenuItem.Visible = false;
                 perrosToolStripMenuItem.Visible = false;
+                liquidacionesToolStripMenuItem.Visible = false;
+                reportesToolStripMenuItem.Visible = false;
+                administradoresToolStripMenuItem.Visible = false;
             }
 
             this.Text = $"Paseadores de Perros - {_usuarioActual.Nombre} {_usuarioActual.Apellido} ({_usuarioActual.Rol})";
@@ -96,6 +102,58 @@ namespace Paseadores.WinForms
             FormPaseos ventanaPaseos = new FormPaseos();
             ventanaPaseos.MdiParent = this;
             ventanaPaseos.Show();
+        }
+
+        private void liquidacionesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var existente = this.MdiChildren.OfType<FormLiquidaciones>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
+            FormLiquidaciones ventanaLiquidaciones = new FormLiquidaciones();
+            ventanaLiquidaciones.MdiParent = this;
+            ventanaLiquidaciones.Show();
+        }
+
+        private void administradoresToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var existente = this.MdiChildren.OfType<FormAdministradores>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
+            FormAdministradores ventanaAdministradores = new FormAdministradores();
+            ventanaAdministradores.MdiParent = this;
+            ventanaAdministradores.Show();
+        }
+
+        private void recaudacionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var existente = this.MdiChildren.OfType<FormReporteRecaudacion>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
+            FormReporteRecaudacion ventanaRecaudacion = new FormReporteRecaudacion();
+            ventanaRecaudacion.MdiParent = this;
+            ventanaRecaudacion.Show();
+        }
+
+        private void actividadPerrosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var existente = this.MdiChildren.OfType<FormReporteActividad>().FirstOrDefault();
+            if (existente != null)
+            {
+                existente.Activate();   // la traigo al frente en vez de crear otra
+                return;
+            }
+            FormReporteActividad ventanaActividad = new FormReporteActividad();
+            ventanaActividad.MdiParent = this;
+            ventanaActividad.Show();
         }
 
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)

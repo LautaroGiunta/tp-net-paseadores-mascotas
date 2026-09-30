@@ -22,6 +22,9 @@ namespace Paseadores.WinForms
         public static PaseadorApiClient Paseadores { get; } = new PaseadorApiClient(_http);
         public static PerroApiClient Perros { get; } = new PerroApiClient(_http);
         public static PaseoApiClient Paseos { get; } = new PaseoApiClient(_http);
+        public static LiquidacionApiClient Liquidaciones { get; } = new LiquidacionApiClient(_http);
+        public static ReporteApiClient Reportes { get; } = new ReporteApiClient(_http);
+        public static AdministradorApiClient Administradores { get; } = new AdministradorApiClient(_http);
         public static string Token { get; private set; } = string.Empty;
 
         public static void GuardarToken(string? token)

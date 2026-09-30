@@ -37,13 +37,18 @@
             dueñosToolStripMenuItem = new ToolStripMenuItem();
             perrosToolStripMenuItem = new ToolStripMenuItem();
             paseosToolStripMenuItem = new ToolStripMenuItem();
+            liquidacionesToolStripMenuItem = new ToolStripMenuItem();
+            administradoresToolStripMenuItem = new ToolStripMenuItem();
+            reportesToolStripMenuItem = new ToolStripMenuItem();
+            recaudacionToolStripMenuItem = new ToolStripMenuItem();
+            actividadPerrosToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { archivoToolStripMenuItem, gestionToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { archivoToolStripMenuItem, gestionToolStripMenuItem, reportesToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(5, 2, 0, 2);
@@ -74,7 +79,7 @@
             // 
             // gestionToolStripMenuItem
             // 
-            gestionToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { paseadoresToolStripMenuItem, dueñosToolStripMenuItem, perrosToolStripMenuItem, paseosToolStripMenuItem });
+            gestionToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { paseadoresToolStripMenuItem, dueñosToolStripMenuItem, perrosToolStripMenuItem, paseosToolStripMenuItem, liquidacionesToolStripMenuItem, administradoresToolStripMenuItem });
             gestionToolStripMenuItem.Name = "gestionToolStripMenuItem";
             gestionToolStripMenuItem.Size = new Size(59, 20);
             gestionToolStripMenuItem.Text = "Gestión";
@@ -107,6 +112,41 @@
             paseosToolStripMenuItem.Text = "Paseos";
             paseosToolStripMenuItem.Click += paseosToolStripMenuItem_Click;
             // 
+            // liquidacionesToolStripMenuItem
+            // 
+            liquidacionesToolStripMenuItem.Name = "liquidacionesToolStripMenuItem";
+            liquidacionesToolStripMenuItem.Size = new Size(150, 22);
+            liquidacionesToolStripMenuItem.Text = "Liquidaciones";
+            liquidacionesToolStripMenuItem.Click += liquidacionesToolStripMenuItem_Click;
+            // 
+            // administradoresToolStripMenuItem
+            // 
+            administradoresToolStripMenuItem.Name = "administradoresToolStripMenuItem";
+            administradoresToolStripMenuItem.Size = new Size(150, 22);
+            administradoresToolStripMenuItem.Text = "Administradores";
+            administradoresToolStripMenuItem.Click += administradoresToolStripMenuItem_Click;
+            // 
+            // reportesToolStripMenuItem
+            // 
+            reportesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { recaudacionToolStripMenuItem, actividadPerrosToolStripMenuItem });
+            reportesToolStripMenuItem.Name = "reportesToolStripMenuItem";
+            reportesToolStripMenuItem.Size = new Size(65, 20);
+            reportesToolStripMenuItem.Text = "Reportes";
+            // 
+            // recaudacionToolStripMenuItem
+            // 
+            recaudacionToolStripMenuItem.Name = "recaudacionToolStripMenuItem";
+            recaudacionToolStripMenuItem.Size = new Size(260, 22);
+            recaudacionToolStripMenuItem.Text = "Recaudación mensual por paseador";
+            recaudacionToolStripMenuItem.Click += recaudacionToolStripMenuItem_Click;
+            // 
+            // actividadPerrosToolStripMenuItem
+            // 
+            actividadPerrosToolStripMenuItem.Name = "actividadPerrosToolStripMenuItem";
+            actividadPerrosToolStripMenuItem.Size = new Size(260, 22);
+            actividadPerrosToolStripMenuItem.Text = "Actividad por perro";
+            actividadPerrosToolStripMenuItem.Click += actividadPerrosToolStripMenuItem_Click;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -138,5 +178,10 @@
         private ToolStripMenuItem dueñosToolStripMenuItem;
         private ToolStripMenuItem perrosToolStripMenuItem;
         private ToolStripMenuItem paseosToolStripMenuItem;
+        private ToolStripMenuItem liquidacionesToolStripMenuItem;
+        private ToolStripMenuItem administradoresToolStripMenuItem;
+        private ToolStripMenuItem reportesToolStripMenuItem;
+        private ToolStripMenuItem recaudacionToolStripMenuItem;
+        private ToolStripMenuItem actividadPerrosToolStripMenuItem;
     }
 }
