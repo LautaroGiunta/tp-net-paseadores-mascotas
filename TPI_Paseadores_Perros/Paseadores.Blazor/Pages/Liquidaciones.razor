@@ -1,0 +1,538 @@
+@page "/liquidaciones"
+@using DTOs
+@using API.Clients
+@inject LiquidacionApiClient LiquidacionApi
+@inject PaseadorApiClient PaseadorApi
+@inject SesionService Sesion
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Liquidaciones</PageTitle>
+
+<div class="container mt-4">
+    <h2>Liquidaciones a paseadores</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeAviso))
+    {
+        <div class="alert alert-warning">@mensajeAviso</div>
+    }
+    @if (!string.IsNullOrEmpty(mensajeOk))
+    {
+        <div class="alert alert-success">@mensajeOk</div>
+    }
+
+    <!-- ===== CABECERA (maestro) ===== -->
+    <div class="card mb-4">
+        <div class="card-header">
+            @(EsAlta ? "Nueva liquidación" : $"Editando liquidación N° {idSeleccionada}")
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Paseador</label>
+                    <select class="form-select" @bind="paseadorId">
+                        <option value="0">-- Elegir --</option>
+                        @if (listaPaseadores != null)
+                        {
+                            @foreach (var p in listaPaseadores)
+                            {
+                                <option value="@p.Id">@p.Apellido, @p.Nombre (@p.Zona)</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Desde</label>
+                    <input type="date" class="form-control" @bind="desde" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Hasta</label>
+                    <input type="date" class="form-control" @bind="hasta" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-primary w-100" @onclick="BuscarPendientes" disabled="@buscando">
+                        @(buscando ? "Buscando..." : "Buscar paseos pendientes")
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== LÍNEAS (detalle): dos grillas, pasar un paseo de una a otra es mover la línea ===== -->
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <h6>Paseos pendientes de liquidar</h6>
+                    @if (!pendientes.Any())
+                    {
+                        <div class="alert alert-secondary py-2">Sin paseos pendientes para mostrar.</div>
+                    }
+                    else
+                    {
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Paseo</th>
+                                    <th>Fecha</th>
+                                    <th>Perro</th>
+                                    <th>Minutos</th>
+                                    <th>Importe</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var d in pendientes.OrderBy(d => d.FechaHoraInicio))
+                                {
+                                    <tr>
+                                        <td>@d.PaseoId</td>
+                                        <td>@d.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@d.PerroNombre</td>
+                                        <td>@d.DuracionMinutos</td>
+                                        <td>@d.Importe.ToString("N2")</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success" @onclick="() => Agregar(d)">Agregar</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h6>Detalle de la liquidación</h6>
+                    @if (!detalle.Any())
+                    {
+                        <div class="alert alert-secondary py-2">Agregá paseos desde la grilla de pendientes.</div>
+                    }
+                    else
+                    {
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Paseo</th>
+                                    <th>Fecha</th>
+                                    <th>Perro</th>
+                                    <th>Minutos</th>
+                                    <th>Importe</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var d in detalle.OrderBy(d => d.FechaHoraInicio))
+                                {
+                                    <tr>
+                                        <td>@d.PaseoId</td>
+                                        <td>@d.FechaHoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@d.PerroNombre</td>
+                                        <td>@d.DuracionMinutos</td>
+                                        <td>@d.Importe.ToString("N2")</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Quitar(d)">Quitar</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    <p class="fw-bold text-end">Total: $@Total.ToString("N2")</p>
+                </div>
+            </div>
+
+            @if (erroresValidacion.Any())
+            {
+                <ul class="alert alert-warning mt-3 mb-0">
+                    @foreach (var error in erroresValidacion)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            }
+
+            <div class="mt-3">
+                <button class="btn btn-primary" @onclick="Guardar" disabled="@guardando">
+                    @(guardando ? "Guardando..." : "Guardar")
+                </button>
+                <button class="btn btn-secondary" @onclick="Limpiar" disabled="@guardando">
+                    Nueva
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LISTADO ===== -->
+    <h5>Liquidaciones registradas</h5>
+    @if (listaLiquidaciones == null)
+    {
+        <div class="alert alert-info">Cargando datos...</div>
+    }
+    else if (!listaLiquidaciones.Any())
+    {
+        <div class="alert alert-secondary">No hay liquidaciones registradas.</div>
+    }
+    else
+    {
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>N°</th>
+                    <th>Paseador</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Paseos</th>
+                    <th>Total</th>
+                    <th>Fecha de alta</th>
+                    <th style="width: 160px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var l in listaLiquidaciones)
+                {
+                    <tr>
+                        <td>@l.Id</td>
+                        <td>@l.PaseadorNombre</td>
+                        <td>@l.FechaDesde.ToString("dd/MM/yyyy")</td>
+                        <td>@l.FechaHasta.ToString("dd/MM/yyyy")</td>
+                        <td>@l.Detalles.Count</td>
+                        <td>@l.Total.ToString("N2")</td>
+                        <td>@l.FechaAlta.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" @onclick="() => Editar(l)">Editar</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => Eliminar(l)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<LiquidacionDTO>? listaLiquidaciones;
+    private List<PaseadorDTO>? listaPaseadores;   // para el combo
+
+    // Cabecera que se está armando (o editando)
+    private int idSeleccionada;                   // 0 = alta
+    private int paseadorId;                       // 0 = sin elegir
+    private DateTime desde;
+    private DateTime hasta;
+
+    // Las dos grillas usan el mismo tipo: pasar un paseo de una a otra es mover la línea
+    private List<LiquidacionDetalleDTO> pendientes = new();
+    private List<LiquidacionDetalleDTO> detalle = new();
+
+    // Paseador con el que se armó el detalle: si se cambia, las líneas ya no corresponden
+    private int? paseadorDelDetalle;
+
+    private List<string> erroresValidacion = new();
+    private string? mensajeError;
+    private string? mensajeAviso;
+    private string? mensajeOk;
+    private bool buscando;
+    private bool guardando;
+
+    // Id 0 = todavía no existe en la base => es un alta
+    private bool EsAlta => idSeleccionada == 0;
+    private decimal Total => detalle.Sum(d => d.Importe);
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Es plata: solo el Admin. El menú esconde el link, esto cubre la URL directa
+        await Sesion.CargarAsync();
+        if (!Sesion.EsAdmin)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        Limpiar();
+        await CargarPaseadoresAsync();
+        await CargarAsync();
+    }
+
+    private async Task CargarPaseadoresAsync()
+    {
+        try
+        {
+            listaPaseadores = await PaseadorApi.GetAllAsync();
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (ApiException ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private async Task CargarAsync()
+    {
+        try
+        {
+            listaLiquidaciones = await LiquidacionApi.GetAllAsync();
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (ApiException ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private async Task BuscarPendientes()
+    {
+        mensajeError = null;
+        mensajeAviso = null;
+        mensajeOk = null;
+
+        if (paseadorId <= 0)
+        {
+            mensajeError = "Seleccioná un paseador.";
+            return;
+        }
+
+        if (desde.Date > hasta.Date)
+        {
+            mensajeError = "La fecha desde no puede ser posterior a la fecha hasta.";
+            return;
+        }
+
+        if (detalle.Count > 0 && paseadorDelDetalle != paseadorId)
+        {
+            var confirmado = await JSRuntime.InvokeAsync<bool>("confirm",
+                "El detalle tiene paseos de otro paseador. ¿Querés vaciarlo y empezar de nuevo?");
+
+            if (!confirmado)
+            {
+                return;
+            }
+
+            detalle.Clear();
+        }
+
+        paseadorDelDetalle = paseadorId;
+        await CargarPendientesAsync(paseadorId, avisarSiNoHay: true);
+    }
+
+    private async Task CargarPendientesAsync(int idPaseador, bool avisarSiNoHay)
+    {
+        buscando = true;
+
+        try
+        {
+            var paseos = await LiquidacionApi.GetPaseosPendientesAsync(idPaseador, desde.Date, hasta.Date);
+
+            // Los que ya están en el detalle (y todavía no se guardaron) no se repiten
+            pendientes = paseos
+                .Where(p => !detalle.Any(d => d.PaseoId == p.Id))
+                .Select(p => new LiquidacionDetalleDTO
+                {
+                    PaseoId = p.Id,
+                    FechaHoraInicio = p.FechaHoraInicio,
+                    DuracionMinutos = p.DuracionMinutos,
+                    PerroNombre = p.PerroNombre,
+                    Importe = p.PrecioTotal
+                })
+                .ToList();
+
+            if (avisarSiNoHay && pendientes.Count == 0)
+            {
+                mensajeAviso = "Ese paseador no tiene paseos terminados sin liquidar en el período.";
+            }
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (ApiException ex)
+        {
+            mensajeError = ex.Message;
+        }
+        finally
+        {
+            buscando = false;
+        }
+    }
+
+    private void Agregar(LiquidacionDetalleDTO linea)
+    {
+        pendientes.Remove(linea);
+        detalle.Add(linea);
+    }
+
+    private void Quitar(LiquidacionDetalleDTO linea)
+    {
+        detalle.Remove(linea);
+        pendientes.Add(linea);
+    }
+
+    // --- Validación a nivel UI (la misma que FormLiquidaciones): la API y el dominio vuelven a validar todo ---
+    private bool EsValido()
+    {
+        erroresValidacion.Clear();
+
+        if (paseadorId <= 0)
+        {
+            erroresValidacion.Add("Hay que elegir un paseador.");
+        }
+
+        if (desde.Date > hasta.Date)
+        {
+            erroresValidacion.Add("La fecha desde no puede ser posterior a la fecha hasta.");
+        }
+
+        if (detalle.Count == 0)
+        {
+            erroresValidacion.Add("Agregá al menos un paseo al detalle.");
+        }
+        else if (paseadorDelDetalle != paseadorId)
+        {
+            erroresValidacion.Add("Cambiaste el paseador: volvé a buscar sus paseos antes de guardar.");
+        }
+
+        if (detalle.Any(d => d.FechaHoraInicio.Date < desde.Date || d.FechaHoraInicio.Date > hasta.Date))
+        {
+            erroresValidacion.Add("Hay paseos en el detalle que quedan fuera del período. Quitálos o ampliá las fechas.");
+        }
+
+        return !erroresValidacion.Any();
+    }
+
+    private async Task Guardar()
+    {
+        mensajeError = null;
+        mensajeAviso = null;
+        mensajeOk = null;
+
+        if (!EsValido())
+        {
+            return;
+        }
+
+        guardando = true;
+
+        // Cabecera y detalle viajan juntos; de cada línea alcanza con el paseo,
+        // el importe lo congela la API con el precio del paseo
+        var liquidacion = new LiquidacionDTO
+        {
+            Id = idSeleccionada,
+            PaseadorId = paseadorId,
+            FechaDesde = desde.Date,
+            FechaHasta = hasta.Date,
+            Detalles = detalle.Select(d => new LiquidacionDetalleDTO { PaseoId = d.PaseoId }).ToList()
+        };
+
+        try
+        {
+            if (EsAlta)
+            {
+                await LiquidacionApi.AddAsync(liquidacion);
+            }
+            else
+            {
+                await LiquidacionApi.UpdateAsync(liquidacion);
+            }
+
+            mensajeOk = EsAlta ? "Liquidación creada con éxito." : "Liquidación actualizada con éxito.";
+            Limpiar();
+            await CargarAsync();
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (ApiException ex) when (ex.StatusCode == 403)
+        {
+            mensajeError = "No tenés permisos para esta operación.";
+        }
+        catch (ApiException ex)
+        {
+            // Reglas de negocio del servicio (ej: el paseo ya está incluido en otra liquidación)
+            mensajeError = ex.Message;
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private async Task Editar(LiquidacionDTO seleccionada)
+    {
+        mensajeError = null;
+        mensajeAviso = null;
+        mensajeOk = null;
+        erroresValidacion.Clear();
+
+        idSeleccionada = seleccionada.Id;
+        paseadorId = seleccionada.PaseadorId;
+        paseadorDelDetalle = seleccionada.PaseadorId;
+        desde = seleccionada.FechaDesde;
+        hasta = seleccionada.FechaHasta;
+
+        // Copia de la lista: si quitáramos líneas de la original, la tabla de abajo
+        // mostraría los cambios sin haberlos guardado todavía
+        detalle = seleccionada.Detalles.ToList();
+
+        // También se muestran los paseos que todavía se le podrían sumar
+        await CargarPendientesAsync(seleccionada.PaseadorId, avisarSiNoHay: false);
+    }
+
+    private async Task Eliminar(LiquidacionDTO seleccionada)
+    {
+        mensajeError = null;
+        mensajeAviso = null;
+        mensajeOk = null;
+
+        var confirmado = await JSRuntime.InvokeAsync<bool>("confirm",
+            $"¿Seguro que querés eliminar la liquidación N° {seleccionada.Id}?\nSus paseos vuelven a quedar pendientes de liquidar.");
+
+        if (!confirmado)
+        {
+            return;
+        }
+
+        try
+        {
+            await LiquidacionApi.DeleteAsync(seleccionada.Id);
+            mensajeOk = "Liquidación eliminada.";
+
+            if (idSeleccionada == seleccionada.Id)
+            {
+                Limpiar();
+            }
+
+            await CargarAsync();
+        }
+        catch (ApiException ex) when (ex.StatusCode == 401)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (ApiException ex) when (ex.StatusCode == 403)
+        {
+            mensajeError = "No tenés permisos para eliminar liquidaciones.";
+        }
+        catch (ApiException ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private void Limpiar()
+    {
+        idSeleccionada = 0;
+        paseadorId = 0;
+        paseadorDelDetalle = null;
+
+        // Por defecto, el mes pasado completo (igual que en escritorio)
+        var inicioMesActual = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        desde = inicioMesActual.AddMonths(-1);
+        hasta = inicioMesActual.AddDays(-1);
+
+        pendientes.Clear();
+        detalle.Clear();
+        erroresValidacion.Clear();
+    }
+}

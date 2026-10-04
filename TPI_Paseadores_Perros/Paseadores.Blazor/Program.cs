@@ -31,6 +31,8 @@ builder.Services.AddHttpClient<ReporteApiClient>(c => c.BaseAddress = urlApi)
        .AddHttpMessageHandler<AuthTokenHandler>();
 builder.Services.AddHttpClient<PaseoApiClient>(c => c.BaseAddress = urlApi)
        .AddHttpMessageHandler<AuthTokenHandler>();
+builder.Services.AddHttpClient<LiquidacionApiClient>(c => c.BaseAddress = urlApi)
+       .AddHttpMessageHandler<AuthTokenHandler>();
 
 // El login NO lleva token (es el único endpoint abierto), va sin handler
 builder.Services.AddHttpClient<AuthApiClient>(c => c.BaseAddress = urlApi);
