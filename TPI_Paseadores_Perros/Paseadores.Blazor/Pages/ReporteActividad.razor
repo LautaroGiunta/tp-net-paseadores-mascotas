@@ -2,6 +2,7 @@
 @using DTOs
 @using API.Clients
 @inject ReporteApiClient ReporteApi
+@inject SesionService Sesion
 @inject NavigationManager Navigation
 
 <PageTitle>Actividad por perro</PageTitle>
@@ -86,6 +87,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // El menú esconde el link, pero por URL directa la página se dibujaba igual y la API devolvía 403
+        await Sesion.CargarAsync();
+        if (!Sesion.EsAdmin)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
         await GenerarAsync();
     }
 

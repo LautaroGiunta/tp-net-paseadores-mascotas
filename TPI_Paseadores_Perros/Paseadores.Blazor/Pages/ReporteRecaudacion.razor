@@ -3,6 +3,7 @@
 @using API.Clients
 @inject ReporteApiClient ReporteApi
 @inject PaseadorApiClient PaseadorApi
+@inject SesionService Sesion
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
@@ -98,6 +99,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // El menú esconde el link, pero por URL directa la página se dibujaba igual y la API devolvía 403
+        await Sesion.CargarAsync();
+        if (!Sesion.EsAdmin)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
         try
         {
             paseadores = (await PaseadorApi.GetAllAsync()).OrderBy(p => p.Id).ToList();
