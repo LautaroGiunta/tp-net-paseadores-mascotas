@@ -35,6 +35,36 @@ regenerarlos desde cero, borrar la base `PaseadoresDB` y volver a levantar la AP
 - Liquidaciones de los meses anteriores al mes pasado; el mes pasado y el actual quedan
   pendientes para poder mostrar el alta de una liquidacion
 
+## Liquidaciones a paseadores (maestro/detalle)
+
+Una liquidacion es lo que se le paga a un paseador por los paseos de un periodo. La cabecera
+(maestro) tiene el paseador y las fechas desde/hasta; el detalle son los paseos que se le pagan,
+cada uno con el importe congelado al precio que tenia el paseo al liquidarlo. El total es la suma
+de los importes. Cabecera y detalle viajan juntos y se guardan en una sola operacion
+(`POST /liquidaciones` o `PUT /liquidaciones`).
+
+Reglas de negocio (las valida el dominio y la API; las pantallas solo avisan antes de mandar):
+
+- Solo entran paseos del paseador elegido, dentro del periodo, **ya terminados** y que **no esten
+  en otra liquidacion**: un paseo se le paga una sola vez. `GET /liquidaciones/paseos-pendientes`
+  devuelve justamente esos.
+- Una liquidacion tiene que incluir al menos un paseo.
+- Un paseo que ya fue liquidado no se puede modificar ni eliminar. Si se elimina la liquidacion,
+  sus paseos vuelven a quedar pendientes.
+- Solo el Admin puede verlas y operarlas.
+
+Como se usa (escritorio: menu *Gestion > Liquidaciones*; web: *Liquidaciones* en el menu, ruta
+`/liquidaciones`):
+
+1. Elegir el paseador y el periodo (por defecto viene el mes pasado completo) y buscar los paseos
+   pendientes.
+2. Pasar los paseos de la grilla de pendientes al detalle (y volverlos a sacar si hace falta).
+   El total se recalcula solo.
+3. Guardar.
+
+Para editar una existente, en escritorio se hace doble clic en la grilla de arriba y en web se usa
+el boton *Editar*: se cargan sus lineas y ademas los paseos que todavia se le podrian sumar.
+
 ## Reportes
 
 Los dos reportes se consultan con **ADO.NET** (`Data/ReporteRepository.cs`: `SqlConnection`,
@@ -89,3 +119,27 @@ El menu de la pantalla principal de escritorio esconde lo mismo que la API bloqu
 La app de escritorio apunta a `https://localhost:7140` (constante `ApiClient.UrlBase`).
 Hay que levantar la WebAPI con el perfil **https** antes de abrirla; si se cambia el
 puerto, se cambia esa unica constante.
+
+### Como correr la aplicacion web (Blazor)
+
+`Paseadores.Blazor` es Blazor WebAssembly: corre en el navegador y le pega a la misma WebAPI
+que el escritorio, con el mismo token JWT (lo guarda en `localStorage`).
+
+1. Levantar la WebAPI (cualquiera de los dos perfiles expone `http://localhost:5206`, que es la
+   URL que usa Blazor en `Program.cs`).
+2. Levantar `Paseadores.Blazor` con el perfil **https** (`https://localhost:7202`). Tiene que ser
+   ese origen porque es el unico que permite la politica CORS `PermitirBlazor` de la WebAPI; si se
+   cambia el puerto, hay que cambiarlo tambien ahi.
+3. Entrar con alguno de los usuarios de prueba. El menu se recorta segun el rol igual que en
+   escritorio, y las paginas solo-Admin (administradores, liquidaciones y reportes) redirigen al
+   inicio si se entra por URL directa con otro rol.
+
+Desde la terminal, en dos consolas:
+
+```
+dotnet run --project TPI_Paseadores_Perros/WebAPI --launch-profile https
+dotnet run --project TPI_Paseadores_Perros/Paseadores.Blazor --launch-profile https
+```
+
+En Visual Studio: clic derecho en la solucion > Configurar proyectos de inicio > Varios proyectos
+de inicio, con WebAPI y Paseadores.Blazor en "Iniciar" (perfil https en los dos).
