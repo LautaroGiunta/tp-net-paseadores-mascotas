@@ -73,13 +73,22 @@ namespace Domain.Model
                 throw new ArgumentException("El teléfono no puede ser nulo o vacío.", nameof(telefono));
             Telefono = telefono.Trim();
         }
-        public void SetContrasena(string contrasena) 
+
+        // Valida la contraseña en texto plano, antes de hashearla
+        public static void ValidarContrasena(string contrasena)
         {
             if (string.IsNullOrWhiteSpace(contrasena))
                 throw new ArgumentException("La contraseña no puede ser nula o vacía.", nameof(contrasena));
             if (contrasena.Length < 8)
                 throw new ArgumentException("La contraseña tiene que tener un minimo de 8 caracteres.", nameof(contrasena));
-            Contrasena = contrasena.Trim();
+        }
+
+        // Recibe la contraseña ya hasheada
+        public void SetContrasena(string contrasenaHasheada)
+        {
+            if (string.IsNullOrWhiteSpace(contrasenaHasheada))
+                throw new ArgumentException("La contraseña no puede ser nula o vacía.", nameof(contrasenaHasheada));
+            Contrasena = contrasenaHasheada;
         }
         public void SetFechaAlta(DateTime fechaAlta)
         {

@@ -24,9 +24,12 @@ namespace Application.Services
                 throw new ArgumentException($"Ya existe un usuario con el email '{dto.Email}'.");
             }
 
+            Usuario.ValidarContrasena(dto.Contrasena);
+            string hash = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+
             var fechaAlta = DateTime.Now;
             Usuario administrador = new Usuario(0, dto.Nombre, dto.Apellido, dto.Email,
-                                                dto.Telefono, dto.Contrasena, RolUsuario.Admin, fechaAlta);
+                                                dto.Telefono, hash, RolUsuario.Admin, fechaAlta);
 
             await administradorRepository.AddAsync(administrador);
 
@@ -75,7 +78,17 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
-            string contrasena = string.IsNullOrWhiteSpace(dto.Contrasena) ? existing.Contrasena : dto.Contrasena;
+            string contrasena;
+            if (string.IsNullOrWhiteSpace(dto.Contrasena))
+            {
+                // No la cambiaron: se queda el hash que ya estaba (no hay que volver a hashearlo)
+                contrasena = existing.Contrasena;
+            }
+            else
+            {
+                Usuario.ValidarContrasena(dto.Contrasena);
+                contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+            }
             Usuario administrador = new Usuario(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
                                                 dto.Telefono, contrasena, RolUsuario.Admin, existing.FechaAlta);
             return await administradorRepository.UpdateAsync(administrador);

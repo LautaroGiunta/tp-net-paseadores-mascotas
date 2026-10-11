@@ -23,13 +23,13 @@ namespace Data
             var ana = context.Duenos.Find(2)!;
             var carlos = context.Paseadores.Find(3)!;
 
-            var martin = new Dueno(0, "Martín", "López", "martin.lopez@paseos.com", "3415550103", "Oroño 845", "Dueno123", alta);
-            var lucia = new Dueno(0, "Lucía", "Fernández", "lucia.fernandez@paseos.com", "3415550104", "Pellegrini 2210", "Dueno123", alta);
-            var jorge = new Dueno(0, "Jorge", "Pérez", "jorge.perez@paseos.com", "3415550105", "Mendoza 3120", "Dueno123", alta);
+            var martin = new Dueno(0, "Martín", "López", "martin.lopez@paseos.com", "3415550103", "Oroño 845", PaseadoresContext.HashDueno123, alta);
+            var lucia = new Dueno(0, "Lucía", "Fernández", "lucia.fernandez@paseos.com", "3415550104", "Pellegrini 2210", PaseadoresContext.HashDueno123, alta);
+            var jorge = new Dueno(0, "Jorge", "Pérez", "jorge.perez@paseos.com", "3415550105", "Mendoza 3120", PaseadoresContext.HashDueno123, alta);
             context.Duenos.AddRange(martin, lucia, jorge);
 
-            var sofia = new Paseador(0, "Sofía", "Martínez", "sofia.martinez@paseos.com", "3415550106", "Norte", 4000m, "Paseo123", alta);
-            var diego = new Paseador(0, "Diego", "Suárez", "diego.suarez@paseos.com", "3415550107", "Oeste", 3000m, "Paseo123", alta);
+            var sofia = new Paseador(0, "Sofía", "Martínez", "sofia.martinez@paseos.com", "3415550106", "Norte", 4000m, PaseadoresContext.HashPaseo123, alta);
+            var diego = new Paseador(0, "Diego", "Suárez", "diego.suarez@paseos.com", "3415550107", "Oeste", 3000m, PaseadoresContext.HashPaseo123, alta);
             context.Paseadores.AddRange(sofia, diego);
             context.SaveChanges();
 

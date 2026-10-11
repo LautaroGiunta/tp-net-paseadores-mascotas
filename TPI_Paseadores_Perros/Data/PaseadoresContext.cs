@@ -11,6 +11,9 @@ namespace Data
 {
     public class PaseadoresContext : DbContext
     {
+        internal const string HashAdmin123 = "$2a$11$awijDt6KCL2HjFegQYT9veuBOQs5e73wuIPuemlA93B.t9LVoQA3y";
+        internal const string HashDueno123 = "$2a$11$myJNnok7ay2koW4KqjG4E..7zSv7OpNgX0EyC30h2.pi1KbnzlU1.";
+        internal const string HashPaseo123 = "$2a$11$DoRb5PcZZGgn/IP3.TgII.6kK9/FGHsfnvQlCYElPSCmJcWfOOsoG";
         public PaseadoresContext(DbContextOptions<PaseadoresContext> options) : base(options)
         {
         }
@@ -100,15 +103,15 @@ namespace Data
 
             modelBuilder.Entity<Usuario>().HasData(
                 new Usuario(1, "Admin", "Sistema", "admin@paseos.com", "3415550100",
-                            "Admin123", RolUsuario.Admin, fechaAlta));
+                            HashAdmin123, RolUsuario.Admin, fechaAlta));
 
             modelBuilder.Entity<Dueno>().HasData(
                 new Dueno(2, "Ana", "Gomez", "ana.gomez@paseos.com", "3415550101",
-                          "Sarmiento 1234", "Dueno123", fechaAlta));
+                          "Sarmiento 1234", HashDueno123, fechaAlta));
 
             modelBuilder.Entity<Paseador>().HasData(
                 new Paseador(3, "Carlos", "Ruiz", "carlos.ruiz@paseos.com", "3415550102",
-                             "Centro", 3500m, "Paseo123", fechaAlta));
+                             "Centro", 3500m, HashPaseo123, fechaAlta));
         }
     }
 }

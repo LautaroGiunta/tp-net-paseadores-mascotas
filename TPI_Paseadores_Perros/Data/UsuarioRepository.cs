@@ -17,12 +17,12 @@ namespace Data
             _context = context;
         }
 
-        public async Task<Usuario?> GetByEmailAndPassAsync(string email, string contrasena)
+        public async Task<Usuario?> GetByEmailAsync(string email)
         {
             // Va a buscar en la tabla general de Usuarios. 
-            // Si el mail y la contraseña coinciden, te devuelve el usuario. Si no, devuelve null.
+            // Busca el usuario por email; la contraseña se verifica en AuthService
             return await _context.Usuarios
-                                 .FirstOrDefaultAsync(u => u.Email == email && u.Contrasena == contrasena);
+                                 .FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }

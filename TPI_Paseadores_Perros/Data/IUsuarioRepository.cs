@@ -9,6 +9,6 @@ namespace Data
 {
     public interface IUsuarioRepository
     {
-        Task<Usuario?> GetByEmailAndPassAsync(string email, string contrasena);
+        Task<Usuario?> GetByEmailAsync(string email);
     }
 }

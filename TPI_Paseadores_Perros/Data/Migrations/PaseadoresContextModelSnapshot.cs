@@ -190,7 +190,7 @@ namespace Data.Migrations
                         {
                             Id = 1,
                             Apellido = "Sistema",
-                            Contrasena = "Admin123",
+                            Contrasena = "$2a$11$awijDt6KCL2HjFegQYT9veuBOQs5e73wuIPuemlA93B.t9LVoQA3y",
                             Email = "admin@paseos.com",
                             FechaAlta = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Admin",
@@ -214,7 +214,7 @@ namespace Data.Migrations
                         {
                             Id = 2,
                             Apellido = "Gomez",
-                            Contrasena = "Dueno123",
+                            Contrasena = "$2a$11$myJNnok7ay2koW4KqjG4E..7zSv7OpNgX0EyC30h2.pi1KbnzlU1.",
                             Email = "ana.gomez@paseos.com",
                             FechaAlta = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Ana",
@@ -243,7 +243,7 @@ namespace Data.Migrations
                         {
                             Id = 3,
                             Apellido = "Ruiz",
-                            Contrasena = "Paseo123",
+                            Contrasena = "$2a$11$DoRb5PcZZGgn/IP3.TgII.6kK9/FGHsfnvQlCYElPSCmJcWfOOsoG",
                             Email = "carlos.ruiz@paseos.com",
                             FechaAlta = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Carlos",

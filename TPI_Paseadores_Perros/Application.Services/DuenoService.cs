@@ -29,9 +29,12 @@ namespace Application.Services
                 throw new ArgumentException($"Ya existe un dueño con el email '{dto.Email}'.");
             }
 
+            Usuario.ValidarContrasena(dto.Contrasena);
+            string hash = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+
             var fechaAlta = DateTime.Now;
             Dueno dueno = new Dueno(0, dto.Nombre, dto.Apellido, dto.Email,
-                                    dto.Telefono, dto.Direccion,dto.Contrasena, fechaAlta);
+                                    dto.Telefono, dto.Direccion, hash, fechaAlta);
 
             await duenoRepository.AddAsync(dueno);
 
@@ -83,7 +86,17 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
-            string contrasena = string.IsNullOrWhiteSpace(dto.Contrasena) ? existing.Contrasena : dto.Contrasena;
+            string contrasena;
+            if (string.IsNullOrWhiteSpace(dto.Contrasena))
+            {
+                // No la cambiaron: se queda el hash que ya estaba (no hay que volver a hashearlo)
+                contrasena = existing.Contrasena;
+            }
+            else
+            {
+                Usuario.ValidarContrasena(dto.Contrasena);
+                contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+            }
             Dueno dueno = new Dueno(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
                                     dto.Telefono, dto.Direccion, contrasena, existing.FechaAlta);
             return await duenoRepository.UpdateAsync(dueno);

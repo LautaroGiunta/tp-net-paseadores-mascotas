@@ -33,9 +33,12 @@ namespace Application.Services
             {
                 throw new ArgumentException("La tarifa por hora debe ser mayor a cero.");
             }
+            Usuario.ValidarContrasena(dto.Contrasena);
+            string hash = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+
             var fechaAlta = DateTime.Now;
             Paseador paseador = new Paseador(0, dto.Nombre, dto.Apellido, dto.Email,
-                                             dto.Telefono, dto.Zona, dto.TarifaPorHora,dto.Contrasena, fechaAlta);
+                                            dto.Telefono,dto.Zona, dto.TarifaPorHora, hash, fechaAlta);
 
             await paseadorRepository.AddAsync(paseador);
 
@@ -93,7 +96,17 @@ namespace Application.Services
             if (existing == null)
                 return false;
 
-            string contrasena = string.IsNullOrWhiteSpace(dto.Contrasena) ? existing.Contrasena : dto.Contrasena;
+            string contrasena;
+            if (string.IsNullOrWhiteSpace(dto.Contrasena))
+            {
+                // No la cambiaron: se queda el hash que ya estaba (no hay que volver a hashearlo)
+                contrasena = existing.Contrasena;
+            }
+            else
+            {
+                Usuario.ValidarContrasena(dto.Contrasena);
+                contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+            }
             Paseador paseador = new Paseador(dto.Id, dto.Nombre, dto.Apellido, dto.Email,
                                              dto.Telefono, dto.Zona, dto.TarifaPorHora, contrasena, existing.FechaAlta);
             return await paseadorRepository.UpdateAsync(paseador);

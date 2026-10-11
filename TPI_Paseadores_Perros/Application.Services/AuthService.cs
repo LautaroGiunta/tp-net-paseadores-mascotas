@@ -16,9 +16,9 @@ namespace Application.Services
 
         public async Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO dto)
         {
-            var usuario = await _usuarioRepository.GetByEmailAndPassAsync(dto.Email, dto.Contrasena);
+            var usuario = await _usuarioRepository.GetByEmailAsync(dto.Email);
 
-            if (usuario == null)
+            if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Contrasena, usuario.Contrasena))
             {
                 return null;
             }
