@@ -116,20 +116,21 @@ El menu de la pantalla principal de escritorio esconde lo mismo que la API bloqu
 
 ### Como correr la aplicacion de escritorio
 
-La app de escritorio apunta a `https://localhost:7140` (constante `ApiClient.UrlBase`).
-Hay que levantar la WebAPI con el perfil **https** antes de abrirla; si se cambia el
-puerto, se cambia esa unica constante.
+La app de escritorio lee la URL de la API de `Paseadores.WinForms/appsettings.json` (clave
+`UrlApi`, por defecto `https://localhost:7140`, el perfil **https** de la WebAPI). Hay que
+levantar la WebAPI antes de abrirla; si se cambia el puerto, se cambia en ese archivo, sin
+recompilar.
 
 ### Como correr la aplicacion web (Blazor)
 
 `Paseadores.Blazor` es Blazor WebAssembly: corre en el navegador y le pega a la misma WebAPI
 que el escritorio, con el mismo token JWT (lo guarda en `localStorage`).
 
-1. Levantar la WebAPI (cualquiera de los dos perfiles expone `http://localhost:5206`, que es la
-   URL que usa Blazor en `Program.cs`).
-2. Levantar `Paseadores.Blazor` con el perfil **https** (`https://localhost:7202`). Tiene que ser
-   ese origen porque es el unico que permite la politica CORS `PermitirBlazor` de la WebAPI; si se
-   cambia el puerto, hay que cambiarlo tambien ahi.
+1. Levantar la WebAPI con el perfil **https**. Blazor toma la URL de la API de
+   `Paseadores.Blazor/wwwroot/appsettings.json` (clave `UrlApi`, por defecto `https://localhost:7140`).
+2. Levantar `Paseadores.Blazor` con cualquiera de sus perfiles: `https://localhost:7202` o
+   `http://localhost:5297`. Los dos estan en `Cors:OrigenesPermitidos` del `appsettings.json` de la
+   WebAPI; si Blazor corre en otro puerto, hay que agregarlo ahi.
 3. Entrar con alguno de los usuarios de prueba. El menu se recorta segun el rol igual que en
    escritorio, y las paginas solo-Admin (administradores, liquidaciones y reportes) redirigen al
    inicio si se entra por URL directa con otro rol.

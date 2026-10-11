@@ -1,4 +1,5 @@
 ﻿using API.Clients;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 
 namespace Paseadores.WinForms
@@ -7,8 +8,13 @@ namespace Paseadores.WinForms
     // y el token que devuelve el login.
     public static class ApiClient
     {
-        // Es la URL del perfil "https" de la WebAPI (Properties/launchSettings.json)
-        public const string UrlBase = "https://localhost:7140";
+        private static readonly IConfiguration _config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+        
+        // URL de la API, sale de appsettings.json (clave UrlApi)
+        public static readonly string UrlBase = _config["UrlApi"]!;
 
         private static readonly HttpClient _http = new HttpClient
         {

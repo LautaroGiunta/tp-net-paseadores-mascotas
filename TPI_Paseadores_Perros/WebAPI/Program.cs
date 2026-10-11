@@ -63,12 +63,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+var origenes = builder.Configuration.GetSection("Cors:OrigenesPermitidos").Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PermitirBlazor", app =>
     {
-        // Acá ponés exactamente la URL que te muestra el navegador cuando abrís Blazor
-        app.WithOrigins("http://localhost:7202", "https://localhost:7202")
+        app.WithOrigins(origenes)
            .AllowAnyHeader()
            .AllowAnyMethod();
     });

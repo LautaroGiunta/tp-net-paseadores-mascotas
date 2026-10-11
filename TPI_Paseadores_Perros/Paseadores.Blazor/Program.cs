@@ -14,7 +14,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
-var urlApi = new Uri("http://localhost:5206");
+var urlApi = new Uri(builder.Configuration["UrlApi"]!);
 
 builder.Services.AddScoped<AuthTokenHandler>();
 builder.Services.AddScoped<SesionService>();
