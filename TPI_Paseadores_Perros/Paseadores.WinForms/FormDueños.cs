@@ -35,8 +35,18 @@ namespace Paseadores.WinForms
                 dgvDueños.DataSource = lista;
 
             }
-            catch (Exception ex)
+            catch (ApiException ex) when (ex.StatusCode == 401)
             {
+                ApiClient.SesionVencida();
+            }
+            catch (ApiException ex)
+            {
+                // La API respondió, pero con un error
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (HttpRequestException ex)
+            {
+                // No hubo respuesta: la API está apagada o la URL está mal
                 MessageBox.Show("No se pudo conectar con la API. ¿Está encendida?\n\nError: " + ex.Message,
                     "Error de conexión", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -81,6 +91,10 @@ namespace Paseadores.WinForms
                 await CargarDueñosAsync();
                 dgvDueños.ClearSelection();
             }
+            catch (ApiException ex) when (ex.StatusCode == 401)
+            {
+                ApiClient.SesionVencida();
+            }
             catch (ApiException ex)
             {
                 // Ahora SÍ se ve el rechazo de la API (antes se perdía por el if sin else)
@@ -122,6 +136,10 @@ namespace Paseadores.WinForms
 
                     MessageBox.Show("Dueño eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     await CargarDueñosAsync();
+                }
+                catch (ApiException ex) when (ex.StatusCode == 401)
+                {
+                    ApiClient.SesionVencida();
                 }
                 catch (ApiException ex)
                 {

@@ -55,6 +55,10 @@ namespace Paseadores.WinForms
                 lblResumen.Text = $"{filas.Sum(f => f.CantidadPaseos)} paseos, ${filas.Sum(f => f.Total):N2} en total" +
                                   (sinPaseos > 0 ? $" · {sinPaseos} perro(s) sin paseos" : "");
             }
+            catch (ApiException ex) when (ex.StatusCode == 401)
+            {
+                ApiClient.SesionVencida();
+            }
             catch (ApiException ex)
             {
                 MessageBox.Show("No se pudo generar el reporte: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);

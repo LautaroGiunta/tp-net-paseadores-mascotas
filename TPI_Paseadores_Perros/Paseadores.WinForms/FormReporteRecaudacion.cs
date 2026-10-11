@@ -28,8 +28,20 @@ namespace Paseadores.WinForms
             {
                 paseadores = (await ApiClient.Paseadores.GetAllAsync()).OrderBy(p => p.Id).ToList();
             }
-            catch (Exception ex)
+            catch (ApiException ex) when (ex.StatusCode == 401)
             {
+                ApiClient.SesionVencida();
+                return;
+            }
+            catch (ApiException ex)
+            {
+                // La API respondió, pero con un error
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            catch (HttpRequestException ex)
+            {
+                // No hubo respuesta: la API está apagada o la URL está mal
                 MessageBox.Show("No se pudo conectar con la API. ¿Está encendida?\n\nError: " + ex.Message,
                     "Error de conexión", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -56,6 +68,10 @@ namespace Paseadores.WinForms
                 var filas = await ApiClient.Reportes.GetRecaudacionMensualAsync(dtpDesde.Value.Date, dtpHasta.Value.Date);
                 MostrarTabla(filas);
                 DibujarGrafico(filas);
+            }
+            catch (ApiException ex) when (ex.StatusCode == 401)
+            {
+                ApiClient.SesionVencida();
             }
             catch (ApiException ex)
             {

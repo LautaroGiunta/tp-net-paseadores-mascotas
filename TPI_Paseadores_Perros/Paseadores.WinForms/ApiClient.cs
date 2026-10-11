@@ -16,6 +16,9 @@ namespace Paseadores.WinForms
         // URL de la API, sale de appsettings.json (clave UrlApi)
         public static readonly string UrlBase = _config["UrlApi"]!;
 
+        // Evita que dos llamadas que fallan juntas muestren el aviso dos veces
+        private static bool _sesionVencida = false;
+
         private static readonly HttpClient _http = new HttpClient
         {
             BaseAddress = new Uri(UrlBase)
@@ -36,6 +39,7 @@ namespace Paseadores.WinForms
         public static void GuardarToken(string? token)
         {
             Token = token ?? string.Empty;
+            _sesionVencida = false;
 
             _http.DefaultRequestHeaders.Authorization = string.IsNullOrWhiteSpace(Token)
                 ? null
@@ -46,6 +50,24 @@ namespace Paseadores.WinForms
         public static void CerrarSesion()
         {
             GuardarToken(null);
+        }
+
+        // La API respondió 401: el token venció. Avisa y vuelve al login,
+        // igual que "Cerrar sesión" del menú.
+        public static void SesionVencida()
+        {
+            if (_sesionVencida) return;
+            _sesionVencida = true;
+
+            MessageBox.Show("Tu sesión venció. Volvé a iniciar sesión.",
+                "Sesión vencida", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            FormMain? main = Application.OpenForms.OfType<FormMain>().FirstOrDefault();
+            if (main != null)
+            {
+                main.QuiereCerrarSesion = true;
+                main.Close();   // cierra también las ventanas hijas (son MDI)
+            }
         }
     }
 }
