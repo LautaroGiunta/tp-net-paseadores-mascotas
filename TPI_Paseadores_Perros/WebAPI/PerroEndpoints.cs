@@ -1,5 +1,6 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs;
+using System.Security.Claims;
 
 namespace WebAPI
 {
@@ -44,8 +45,12 @@ namespace WebAPI
             .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
-            app.MapPost("/perros", async (PerroDTO dto, IPerroService perroService) =>
+            app.MapPost("/perros", async (PerroDTO dto, ClaimsPrincipal usuario, IPerroService perroService) =>
             {
+                if(usuario.EsDueno() && dto.DuenoId != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés cargar perros a nombre de otro dueño.");
+                }
                 try
                 {
                     PerroDTO perroDTO = await perroService.AddAsync(dto);
@@ -62,8 +67,22 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/perros", async (PerroDTO dto, IPerroService perroService) =>
+            app.MapPut("/perros", async (PerroDTO dto, ClaimsPrincipal usuario, IPerroService perroService) =>
             {
+                if (usuario.EsDueno())
+                {
+                    PerroDTO? actual = await perroService.GetAsync(dto.Id);
+
+                    if (actual != null && actual.DuenoId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés modificar un perro de otro dueño.");
+                    }
+
+                    if (dto.DuenoId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés pasarle el perro a otro dueño.");
+                    }
+                }
                 try
                 {
                     var found = await perroService.UpdateAsync(dto);
@@ -87,8 +106,17 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapDelete("/perros/{id}", async (int id, IPerroService perroService) =>
+            app.MapDelete("/perros/{id}", async (int id, ClaimsPrincipal usuario, IPerroService perroService) =>
             {
+                if (usuario.EsDueno())
+                {
+                    PerroDTO? actual = await perroService.GetAsync(id);
+
+                    if (actual != null && actual.DuenoId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés eliminar un perro de otro dueño.");
+                    }
+                }
                 try
                 {
                     var deleted = await perroService.DeleteAsync(id);

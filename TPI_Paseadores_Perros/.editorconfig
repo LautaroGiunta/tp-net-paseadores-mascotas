@@ -1,0 +1,5 @@
+root = true
+
+# Visual Studio guarda los .cs en UTF-8 (con BOM) para que las tildes no se rompan
+[*.cs]
+charset = utf-8-bom

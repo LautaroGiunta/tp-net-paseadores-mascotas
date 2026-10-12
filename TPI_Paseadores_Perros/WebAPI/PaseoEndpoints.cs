@@ -1,10 +1,19 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs;
+using System.Security.Claims;
 
 namespace WebAPI
 {
     public static class PaseoEndpoints
     {
+        // El dueño de un paseo es el dueño del perro.
+        // Si el perro no existe devolvemos true y dejamos que el service tire su error.
+        private static async Task<bool> EsPerroDelUsuario(int perroId, ClaimsPrincipal usuario, IPerroService perroService)
+        {
+            PerroDTO? perro = await perroService.GetAsync(perroId);
+            return perro == null || perro.DuenoId == usuario.ObtenerId();
+        }
+
         public static void MapPaseoEndpoints(this WebApplication app)
         {
             app.MapGet("/paseos/{id}", async (int id, IPaseoService paseoService) =>
@@ -60,8 +69,16 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPost("/paseos", async (PaseoDTO dto, IPaseoService paseoService) =>
+            app.MapPost("/paseos", async (PaseoDTO dto, ClaimsPrincipal usuario, IPaseoService paseoService, IPerroService perroService) =>
             {
+                if (usuario.EsDueno() && !await EsPerroDelUsuario(dto.PerroId, usuario, perroService))
+                {
+                    return UsuarioActual.Prohibido("No podés pedir un paseo para un perro de otro dueño.");
+                }
+                if (usuario.EsPaseador() && dto.PaseadorId != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés registrar un paseo a nombre de otro paseador.");
+                }
                 try
                 {
                     PaseoDTO paseoDTO = await paseoService.AddAsync(dto);
@@ -78,8 +95,37 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapPut("/paseos", async (PaseoDTO dto, IPaseoService paseoService) =>
+            app.MapPut("/paseos", async (PaseoDTO dto, ClaimsPrincipal usuario,
+                             IPaseoService paseoService, IPerroService perroService) =>
             {
+                if (usuario.EsDueno())
+                {
+                    PaseoDTO? actual = await paseoService.GetAsync(dto.Id);
+
+                    if (actual != null && !await EsPerroDelUsuario(actual.PerroId, usuario, perroService))
+                    {
+                        return UsuarioActual.Prohibido("No podés modificar un paseo de otro dueño.");
+                    }
+
+                    if (!await EsPerroDelUsuario(dto.PerroId, usuario, perroService))
+                    {
+                        return UsuarioActual.Prohibido("No podés asignarle el paseo a un perro de otro dueño.");
+                    }
+                }
+                if (usuario.EsPaseador())
+                {
+                    PaseoDTO? actual = await paseoService.GetAsync(dto.Id);
+
+                    if (actual != null && actual.PaseadorId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés modificar un paseo de otro paseador.");
+                    }
+
+                    if (dto.PaseadorId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés pasarle el paseo a otro paseador.");
+                    }
+                }
                 try
                 {
                     var found = await paseoService.UpdateAsync(dto);
@@ -103,8 +149,27 @@ namespace WebAPI
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
-            app.MapDelete("/paseos/{id}", async (int id, IPaseoService paseoService) =>
+            app.MapDelete("/paseos/{id}", async (int id, ClaimsPrincipal usuario,
+                                    IPaseoService paseoService, IPerroService perroService) =>
             {
+                if (usuario.EsDueno())
+                {
+                    PaseoDTO? actual = await paseoService.GetAsync(id);
+
+                    if (actual != null && !await EsPerroDelUsuario(actual.PerroId, usuario, perroService))
+                    {
+                        return UsuarioActual.Prohibido("No podés eliminar un paseo de otro dueño.");
+                    }
+                }
+                if (usuario.EsPaseador())
+                {
+                    PaseoDTO? actual = await paseoService.GetAsync(id);
+
+                    if (actual != null && actual.PaseadorId != usuario.ObtenerId())
+                    {
+                        return UsuarioActual.Prohibido("No podés eliminar un paseo de otro paseador.");
+                    }
+                }
                 try
                 {
                     var deleted = await paseoService.DeleteAsync(id);
