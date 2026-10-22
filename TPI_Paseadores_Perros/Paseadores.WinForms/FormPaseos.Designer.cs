@@ -339,7 +339,7 @@ namespace Paseadores.WinForms
             Margin = new Padding(3, 2, 3, 2);
             Name = "FormPaseos";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "FormPaseos";
+            Text = "Paseos";
             WindowState = FormWindowState.Maximized;
             Load += FormPaseos_Load;
             ((System.ComponentModel.ISupportInitialize)dgvPaseos).EndInit();

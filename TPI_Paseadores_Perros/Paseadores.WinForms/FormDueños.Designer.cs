@@ -229,7 +229,7 @@
             // colTelefono
             // 
             colTelefono.DataPropertyName = "Telefono";
-            colTelefono.HeaderText = "Telefono";
+            colTelefono.HeaderText = "Teléfono";
             colTelefono.MinimumWidth = 6;
             colTelefono.Name = "colTelefono";
             colTelefono.ReadOnly = true;
@@ -237,7 +237,7 @@
             // colDireccion
             // 
             colDireccion.DataPropertyName = "Direccion";
-            colDireccion.HeaderText = "Direccion";
+            colDireccion.HeaderText = "Dirección";
             colDireccion.MinimumWidth = 6;
             colDireccion.Name = "colDireccion";
             colDireccion.ReadOnly = true;
@@ -295,7 +295,7 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "FormDueños";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "FormDueños";
+            Text = "Dueños";
             WindowState = FormWindowState.Maximized;
             Load += FormDueños_Load;
             ((System.ComponentModel.ISupportInitialize)dgvDueños).EndInit();

@@ -1,4 +1,4 @@
-using API.Clients;
+﻿using API.Clients;
 using System.Globalization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -34,7 +34,7 @@ builder.Services.AddHttpClient<PaseoApiClient>(c => c.BaseAddress = urlApi)
 builder.Services.AddHttpClient<LiquidacionApiClient>(c => c.BaseAddress = urlApi)
        .AddHttpMessageHandler<AuthTokenHandler>();
 
-// El login NO lleva token (es el �nico endpoint abierto), va sin handler
+// El login NO lleva token (es el único endpoint abierto), va sin handler
 builder.Services.AddHttpClient<AuthApiClient>(c => c.BaseAddress = urlApi);
 
 await builder.Build().RunAsync();

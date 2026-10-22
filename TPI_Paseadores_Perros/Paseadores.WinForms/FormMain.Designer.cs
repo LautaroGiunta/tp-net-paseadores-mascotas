@@ -158,7 +158,7 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "FormMain";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "FormMain";
+            Text = "Paseadores de Perros";
             WindowState = FormWindowState.Maximized;
             Load += FormMain_Load;
             menuStrip1.ResumeLayout(false);

@@ -232,7 +232,7 @@ namespace Paseadores.WinForms
             Margin = new Padding(3, 2, 3, 2);
             Name = "FormPerros";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "FormPerros";
+            Text = "Perros";
             WindowState = FormWindowState.Maximized;
             Load += FormPerros_Load;
             ((System.ComponentModel.ISupportInitialize)dgvPerros).EndInit();

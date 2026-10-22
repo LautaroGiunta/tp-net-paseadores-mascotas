@@ -93,7 +93,7 @@
             MaximizeBox = false;
             Name = "FormLogin";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "FormLogin";
+            Text = "Iniciar sesión";
             ResumeLayout(false);
             PerformLayout();
         }

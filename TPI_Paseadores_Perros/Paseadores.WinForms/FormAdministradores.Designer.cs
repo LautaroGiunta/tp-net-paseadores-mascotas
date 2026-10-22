@@ -209,7 +209,7 @@ namespace Paseadores.WinForms
             // colTelefono
             //
             colTelefono.DataPropertyName = "Telefono";
-            colTelefono.HeaderText = "Telefono";
+            colTelefono.HeaderText = "Teléfono";
             colTelefono.MinimumWidth = 6;
             colTelefono.Name = "colTelefono";
             colTelefono.ReadOnly = true;

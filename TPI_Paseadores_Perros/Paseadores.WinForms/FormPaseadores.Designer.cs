@@ -109,7 +109,7 @@
             // colTelefono
             // 
             colTelefono.DataPropertyName = "Telefono";
-            colTelefono.HeaderText = "Telefono";
+            colTelefono.HeaderText = "Teléfono";
             colTelefono.MinimumWidth = 6;
             colTelefono.Name = "colTelefono";
             colTelefono.ReadOnly = true;
@@ -326,7 +326,7 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "FormPaseadores";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "FormPaseadores";
+            Text = "Paseadores";
             WindowState = FormWindowState.Maximized;
             Load += FormPaseadores_Load;
             ((System.ComponentModel.ISupportInitialize)dgvPaseadores).EndInit();
