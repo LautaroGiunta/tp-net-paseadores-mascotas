@@ -18,10 +18,15 @@ namespace Paseadores.WinForms
         private int idPerroSeleccionado = 0;
         private List<PerroDTO> perrosCargados = new List<PerroDTO>();
 
+        // Un dueño solo ve y carga sus propios perros (la API igual lo controla)
+        private readonly UsuarioDTO usuario;
+        private bool EsDueno => usuario.Rol == "Dueno";
 
-        public FormPerros()
+
+        public FormPerros(UsuarioDTO usuarioLogueado)
         {
             InitializeComponent();
+            usuario = usuarioLogueado;
         }
 
         private async void FormPerros_Load(object sender, EventArgs e)
@@ -37,12 +42,17 @@ namespace Paseadores.WinForms
             try
             {
                 List<DuenoDTO> duenos = await ApiClient.Duenos.GetAllAsync();
+
+                if (EsDueno)
+                    duenos = duenos.Where(d => d.Id == usuario.Id).ToList();
+
                 cmbDueno.DataSource = duenos
                     .Select(d => new { d.Id, Descripcion = d.Apellido + ", " + d.Nombre })
                     .ToList();
                 cmbDueno.DisplayMember = "Descripcion";
                 cmbDueno.ValueMember = "Id";
                 cmbDueno.SelectedIndex = -1;
+                FijarDuenoSiCorresponde();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
             {
@@ -61,11 +71,23 @@ namespace Paseadores.WinForms
             }
         }
 
+        // Si es dueño, el combo queda fijo en él: no puede cargarle perros a otro
+        private void FijarDuenoSiCorresponde()
+        {
+            if (!EsDueno) return;
+
+            cmbDueno.SelectedValue = usuario.Id;
+            cmbDueno.Enabled = false;
+        }
+
         private async Task CargarPerrosAsync()
         {
             try
             {
-                perrosCargados = await ApiClient.Perros.GetAllAsync();
+                // El dueño usa el endpoint anidado /duenos/{id}/perros
+                perrosCargados = EsDueno
+                    ? await ApiClient.Perros.GetByDuenoAsync(usuario.Id)
+                    : await ApiClient.Perros.GetAllAsync();
 
                 dgvPerros.DataSource = perrosCargados.Select(p => new
                 {
@@ -150,6 +172,7 @@ namespace Paseadores.WinForms
             txtRaza.Clear();
             nudEdad.Value = 0;
             cmbDueno.SelectedIndex = -1;
+            FijarDuenoSiCorresponde();
             idPerroSeleccionado = 0;
         }
 

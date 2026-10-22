@@ -86,7 +86,7 @@ namespace Paseadores.WinForms
                 existente.Activate();   // la traigo al frente en vez de crear otra
                 return;
             }
-            FormPerros ventanaPerros = new FormPerros();
+            FormPerros ventanaPerros = new FormPerros(_usuarioActual);
             ventanaPerros.MdiParent = this;
             ventanaPerros.Show();
         }
@@ -99,7 +99,7 @@ namespace Paseadores.WinForms
                 existente.Activate();   // la traigo al frente en vez de crear otra
                 return;
             }
-            FormPaseos ventanaPaseos = new FormPaseos();
+            FormPaseos ventanaPaseos = new FormPaseos(_usuarioActual);
             ventanaPaseos.MdiParent = this;
             ventanaPaseos.Show();
         }

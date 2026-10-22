@@ -5,6 +5,7 @@
 @inject DuenoApiClient DuenoApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject SesionService Sesion
 
 <div class="container mt-4">
     <h2>Perros</h2>
@@ -39,7 +40,7 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Dueño</label>
-                    <select class="form-select" @bind="perro.DuenoId">
+                    <select class="form-select" @bind="perro.DuenoId" disabled="@Sesion.EsDueno">
                         <option value="0">-- Elegir --</option>
                         @if (listaDuenos != null)
                         {
@@ -73,20 +74,23 @@
         </div>
     </div>
 
-    <!-- ===== FILTRO POR DUEÑO ===== -->
-    <div class="input-group mb-3">
-        <span class="input-group-text">Filtrar por dueño</span>
-        <select class="form-select" @bind="filtroDuenoId" @bind:after="CargarAsync">
-            <option value="0">Todos los dueños</option>
-            @if (listaDuenos != null)
-            {
-                @foreach (var d in listaDuenos)
+    <!-- ===== FILTRO POR DUEÑO (el dueño ya ve solo los suyos) ===== -->
+    @if (!Sesion.EsDueno)
+    {
+        <div class="input-group mb-3">
+            <span class="input-group-text">Filtrar por dueño</span>
+            <select class="form-select" @bind="filtroDuenoId" @bind:after="CargarAsync">
+                <option value="0">Todos los dueños</option>
+                @if (listaDuenos != null)
                 {
-                    <option value="@d.Id">@d.Nombre @d.Apellido</option>
+                    @foreach (var d in listaDuenos)
+                    {
+                        <option value="@d.Id">@d.Nombre @d.Apellido</option>
+                    }
                 }
-            }
-        </select>
-    </div>
+            </select>
+        </div>
+    }
 
     <!-- ===== LISTADO ===== -->
     @if (listaPerros == null)
@@ -145,6 +149,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Sesion.CargarAsync();
+        perro = NuevoPerro();
         await CargarDuenosAsync();
         await CargarAsync();
     }
@@ -155,6 +161,12 @@
         try
         {
             listaDuenos = await DuenoApi.GetAllAsync();
+
+            // Un dueño solo puede cargarse perros a sí mismo
+            if (Sesion.EsDueno)
+            {
+                listaDuenos = listaDuenos.Where(d => d.Id == Sesion.Id).ToList();
+            }
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
@@ -170,10 +182,12 @@
     {
         try
         {
-            // Con filtro usamos el endpoint anidado /duenos/{id}/perros
-            listaPerros = filtroDuenoId == 0
+            // Con filtro usamos el endpoint anidado /duenos/{id}/perros.
+            // El dueño siempre queda filtrado por él mismo.
+            int duenoId = Sesion.EsDueno ? Sesion.Id : filtroDuenoId;
+            listaPerros = duenoId == 0
                 ? await PerroApi.GetAllAsync()
-                : await PerroApi.GetByDuenoAsync(filtroDuenoId);
+                : await PerroApi.GetByDuenoAsync(duenoId);
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
@@ -317,9 +331,15 @@
         }
     }
 
+    // Si es dueño, el perro nuevo ya viene a su nombre
+    private PerroDTO NuevoPerro()
+    {
+        return new PerroDTO { DuenoId = Sesion.EsDueno ? Sesion.Id : 0 };
+    }
+
     private void Limpiar()
     {
-        perro = new PerroDTO();
+        perro = NuevoPerro();
         erroresValidacion.Clear();
     }
 }

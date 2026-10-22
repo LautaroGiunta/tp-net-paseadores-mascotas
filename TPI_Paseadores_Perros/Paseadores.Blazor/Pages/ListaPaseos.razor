@@ -6,6 +6,7 @@
 @inject PerroApiClient PerroApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject SesionService Sesion
 
 <div class="container mt-4">
     <h2>Paseos</h2>
@@ -28,7 +29,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Paseador</label>
-                    <select class="form-select" @bind="paseo.PaseadorId">
+                    <select class="form-select" @bind="paseo.PaseadorId" disabled="@Sesion.EsPaseador">
                         <option value="0">-- Elegir --</option>
                         @if (listaPaseadores != null)
                         {
@@ -90,7 +91,7 @@
             <div class="row g-2 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label">Paseador</label>
-                    <select class="form-select" @bind="filtroPaseadorId">
+                    <select class="form-select" @bind="filtroPaseadorId" disabled="@Sesion.EsPaseador">
                         <option value="0">Todos los paseadores</option>
                         @if (listaPaseadores != null)
                         {
@@ -167,7 +168,7 @@
     private List<PaseoDTO>? listaPaseos;
     private List<PaseadorDTO>? listaPaseadores;   // para los combos y el filtro
     private List<PerroDTO>? listaPerros;
-    private PaseoDTO paseo = NuevoPaseo();
+    private PaseoDTO paseo = new PaseoDTO();
     private List<string> erroresValidacion = new();
     private string? mensajeError;
     private string? mensajeOk;
@@ -181,19 +182,47 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Sesion.CargarAsync();
+        paseo = NuevoPaseo();
+        filtroPaseadorId = FiltroPaseadorInicial();
         await CargarCombosAsync();
         await CargarAsync();
     }
 
-    private static PaseoDTO NuevoPaseo()
+    private PaseoDTO NuevoPaseo()
     {
-        // Igual que en escritorio: arranca una hora más tarde, redondeado a la hora
+        // Igual que en escritorio: arranca una hora más tarde, redondeado a la hora.
+        // Si es paseador, el paseo ya viene a su nombre.
         var enUnaHora = DateTime.Now.AddHours(1);
         return new PaseoDTO
         {
+            PaseadorId = Sesion.EsPaseador ? Sesion.Id : 0,
             FechaHoraInicio = new DateTime(enUnaHora.Year, enUnaHora.Month, enUnaHora.Day, enUnaHora.Hour, 0, 0),
             DuracionMinutos = 60
         };
+    }
+
+    // El paseador busca siempre sobre sus propios paseos
+    private int FiltroPaseadorInicial()
+    {
+        return Sesion.EsPaseador ? Sesion.Id : 0;
+    }
+
+    // Deja solo los paseos que le corresponden al usuario logueado
+    // (la API igual rechaza con 403 si alguno toca algo ajeno)
+    private List<PaseoDTO> FiltrarSegunUsuario(List<PaseoDTO> lista)
+    {
+        if (Sesion.EsDueno)
+        {
+            // El dueño de un paseo es el dueño del perro
+            var idsDeMisPerros = (listaPerros ?? new List<PerroDTO>()).Select(p => p.Id).ToHashSet();
+            return lista.Where(p => idsDeMisPerros.Contains(p.PerroId)).ToList();
+        }
+        if (Sesion.EsPaseador)
+        {
+            return lista.Where(p => p.PaseadorId == Sesion.Id).ToList();
+        }
+        return lista;
     }
 
     private async Task CargarCombosAsync()
@@ -201,7 +230,10 @@
         try
         {
             listaPaseadores = await PaseadorApi.GetAllAsync();
-            listaPerros = await PerroApi.GetAllAsync();
+            // El dueño solo puede pedir paseos para sus perros
+            listaPerros = Sesion.EsDueno
+                ? await PerroApi.GetByDuenoAsync(Sesion.Id)
+                : await PerroApi.GetAllAsync();
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
@@ -217,7 +249,7 @@
     {
         try
         {
-            listaPaseos = await PaseoApi.GetAllAsync();
+            listaPaseos = FiltrarSegunUsuario(await PaseoApi.GetAllAsync());
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
@@ -245,7 +277,7 @@
         {
             int? paseadorId = filtroPaseadorId == 0 ? null : filtroPaseadorId;
             DateTime? hasta = filtroHasta?.Date.AddDays(1).AddSeconds(-1);
-            listaPaseos = await PaseoApi.BuscarAsync(paseadorId, filtroDesde?.Date, hasta);
+            listaPaseos = FiltrarSegunUsuario(await PaseoApi.BuscarAsync(paseadorId, filtroDesde?.Date, hasta));
         }
         catch (ApiException ex) when (ex.StatusCode == 401)
         {
@@ -259,7 +291,7 @@
 
     private async Task VerTodos()
     {
-        filtroPaseadorId = 0;
+        filtroPaseadorId = FiltroPaseadorInicial();
         filtroDesde = null;
         filtroHasta = null;
         await CargarAsync();

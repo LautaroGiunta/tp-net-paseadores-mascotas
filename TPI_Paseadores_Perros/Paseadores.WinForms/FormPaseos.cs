@@ -20,10 +20,17 @@ namespace Paseadores.WinForms
         private List<PaseadorDTO> paseadores = new List<PaseadorDTO>();
         private List<PerroDTO> perros = new List<PerroDTO>();
 
+        // El dueño solo ve los paseos de sus perros y el paseador solo los suyos
+        // (la API igual rechaza con 403 si alguno toca algo ajeno)
+        private readonly UsuarioDTO usuario;
+        private bool EsDueno => usuario.Rol == "Dueno";
+        private bool EsPaseador => usuario.Rol == "Paseador";
 
-        public FormPaseos()
+
+        public FormPaseos(UsuarioDTO usuarioLogueado)
         {
             InitializeComponent();
+            usuario = usuarioLogueado;
         }
 
         private async void FormPaseos_Load(object sender, EventArgs e)
@@ -42,7 +49,9 @@ namespace Paseadores.WinForms
             try
             {
                 paseadores = await ApiClient.Paseadores.GetAllAsync();
-                perros = await ApiClient.Perros.GetAllAsync();
+                perros = EsDueno
+                    ? await ApiClient.Perros.GetByDuenoAsync(usuario.Id)
+                    : await ApiClient.Perros.GetAllAsync();
 
                 cmbPaseador.DataSource = paseadores
                     .Select(p => new { p.Id, Descripcion = p.Apellido + ", " + p.Nombre + " (" + p.Zona + ")" })
@@ -65,6 +74,7 @@ namespace Paseadores.WinForms
                 cmbFiltroPaseador.DisplayMember = "Descripcion";
                 cmbFiltroPaseador.ValueMember = "Id";
                 cmbFiltroPaseador.SelectedIndex = -1;
+                FijarPaseadorSiCorresponde();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
             {
@@ -83,11 +93,38 @@ namespace Paseadores.WinForms
             }
         }
 
+        // Si es paseador, los combos quedan fijos en él: no puede registrar paseos de otro
+        private void FijarPaseadorSiCorresponde()
+        {
+            if (!EsPaseador) return;
+
+            cmbPaseador.SelectedValue = usuario.Id;
+            cmbPaseador.Enabled = false;
+            cmbFiltroPaseador.SelectedValue = usuario.Id;
+            cmbFiltroPaseador.Enabled = false;
+        }
+
+        // Deja solo los paseos que le corresponden al usuario logueado
+        private List<PaseoDTO> FiltrarSegunUsuario(List<PaseoDTO> lista)
+        {
+            if (EsDueno)
+            {
+                // El dueño de un paseo es el dueño del perro
+                var idsDeMisPerros = perros.Select(p => p.Id).ToHashSet();
+                return lista.Where(p => idsDeMisPerros.Contains(p.PerroId)).ToList();
+            }
+            if (EsPaseador)
+            {
+                return lista.Where(p => p.PaseadorId == usuario.Id).ToList();
+            }
+            return lista;
+        }
+
         private async Task CargarPaseosAsync()
         {
             try
             {
-                paseosCargados = await ApiClient.Paseos.GetAllAsync();
+                paseosCargados = FiltrarSegunUsuario(await ApiClient.Paseos.GetAllAsync());
                 MostrarPaseos();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
@@ -174,6 +211,7 @@ namespace Paseadores.WinForms
         {
             cmbPaseador.SelectedIndex = -1;
             cmbPerro.SelectedIndex = -1;
+            FijarPaseadorSiCorresponde();
             dtpFechaHora.Value = DateTime.Now.AddHours(1);
             nudDuracion.Value = 60;
             idPaseoSeleccionado = 0;
@@ -227,7 +265,7 @@ namespace Paseadores.WinForms
                 DateTime? hasta = chkFiltrarFechas.Checked
                     ? dtpHasta.Value.Date.AddDays(1).AddSeconds(-1) : (DateTime?)null;
 
-                paseosCargados = await ApiClient.Paseos.BuscarAsync(paseadorId, desde, hasta);
+                paseosCargados = FiltrarSegunUsuario(await ApiClient.Paseos.BuscarAsync(paseadorId, desde, hasta));
                 MostrarPaseos();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
@@ -243,6 +281,7 @@ namespace Paseadores.WinForms
         private async void btnVerTodos_Click(object sender, EventArgs e)
         {
             cmbFiltroPaseador.SelectedIndex = -1;
+            FijarPaseadorSiCorresponde();
             chkFiltrarFechas.Checked = false;
             await CargarPaseosAsync();
         }
