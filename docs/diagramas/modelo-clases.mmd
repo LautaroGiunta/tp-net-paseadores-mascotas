@@ -1,0 +1,98 @@
+classDiagram
+    direction TB
+
+    class RolUsuario {
+        <<enumeration>>
+        Admin
+        Dueno
+        Paseador
+    }
+
+    class Usuario {
+        +int Id
+        +string Nombre
+        +string Apellido
+        +string Email
+        +string Telefono
+        +string Contrasena
+        +RolUsuario Rol
+        +DateTime FechaAlta
+        +SetNombre(nombre)
+        +SetEmail(email)
+        +SetContrasena(hash)
+        +ValidarContrasena(texto)$
+    }
+
+    class Dueno {
+        +string Direccion
+        +SetDireccion(direccion)
+    }
+
+    class Paseador {
+        +string Zona
+        +decimal TarifaPorHora
+        +SetZona(zona)
+        +SetTarifaPorHora(tarifa)
+        +CalcularPrecio(duracionMinutos) decimal
+    }
+
+    class Perro {
+        +int Id
+        +int DuenoId
+        +string Nombre
+        +string Raza
+        +int Edad
+        +DateTime FechaAlta
+    }
+
+    class Paseo {
+        +int Id
+        +int PaseadorId
+        +int PerroId
+        +DateTime FechaHoraInicio
+        +int DuracionMinutos
+        +decimal PrecioTotal
+        +DateTime FechaAlta
+        +CalcularFechaHoraFin() DateTime
+    }
+
+    class Liquidacion {
+        +int Id
+        +int PaseadorId
+        +DateTime FechaDesde
+        +DateTime FechaHasta
+        +DateTime FechaAlta
+        +AgregarPaseo(paseo)
+        +QuitarPaseo(paseoId)
+        +ValidarQueTengaDetalles()
+        +CalcularTotal() decimal
+        +ActualizarDesde(otra)
+    }
+
+    class LiquidacionDetalle {
+        +int Id
+        +int LiquidacionId
+        +int PaseoId
+        +decimal Importe
+    }
+
+    class PaseoCriteria {
+        +int? PaseadorId
+        +int? PerroId
+        +DateTime? FechaDesde
+        +DateTime? FechaHasta
+    }
+
+    class PaseadorCriteria {
+        +string Texto
+    }
+
+    Usuario <|-- Dueno
+    Usuario <|-- Paseador
+    Usuario --> RolUsuario : Rol
+    Dueno "1" <-- "0..*" Perro : Dueno
+    Paseador "1" <-- "0..*" Paseo : Paseador
+    Perro "1" <-- "0..*" Paseo : Perro
+    Paseador "1" <-- "0..*" Liquidacion : Paseador
+    Liquidacion "1" *-- "1..*" LiquidacionDetalle : Detalles
+    LiquidacionDetalle "0..1" --> "1" Paseo : Paseo

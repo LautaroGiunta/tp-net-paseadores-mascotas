@@ -1,0 +1,32 @@
+flowchart TB
+    subgraph PRES["Capa de presentación"]
+        WF["Paseadores.WinForms<br/>(escritorio, net8.0-windows)<br/>ScottPlot"]
+        BZ["Paseadores.Blazor<br/>(Blazor WebAssembly)<br/>Chart.js"]
+    end
+
+    AC["API.Clients<br/>(HttpClient tipados + token JWT)"]
+
+    subgraph SRV["Servidor"]
+        API["WebAPI<br/>(ASP.NET Core Minimal API)<br/>JWT, políticas por rol, Swagger, CORS"]
+        SVC["Application.Services<br/>(servicios: reglas de negocio,<br/>mapeo entidad ↔ DTO, BCrypt, tokens)"]
+        DATA["Data<br/>(EF Core: DbContext, repositorios, migraciones,<br/>datos de prueba / ADO.NET: reportes)"]
+        DOM["Domain.Model<br/>(entidades con validaciones)"]
+    end
+
+    DTO["DTOs<br/>(contratos compartidos)"]
+    DB[("SQL Server<br/>PaseadoresDB")]
+
+    WF --> AC
+    BZ --> AC
+    AC -- "HTTPS + JSON<br/>Authorization: Bearer" --> API
+    API --> SVC
+    SVC --> DATA
+    DATA --> DOM
+    API -.-> DOM
+    DATA -- "EF Core / SqlClient" --> DB
+
+    WF -.-> DTO
+    BZ -.-> DTO
+    AC -.-> DTO
+    API -.-> DTO
+    SVC -.-> DTO

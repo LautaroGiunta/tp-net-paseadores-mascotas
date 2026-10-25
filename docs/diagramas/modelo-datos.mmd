@@ -1,0 +1,59 @@
+erDiagram
+    Usuarios {
+        int Id PK "IDENTITY"
+        nvarchar Nombre "NOT NULL"
+        nvarchar Apellido "NOT NULL"
+        nvarchar Email "NOT NULL"
+        nvarchar Telefono "NOT NULL"
+        nvarchar Contrasena "NOT NULL, hash BCrypt"
+        int Rol "0 Admin, 1 Dueno, 2 Paseador"
+        datetime2 FechaAlta
+    }
+    Duenos {
+        int Id PK, FK "-> Usuarios.Id"
+        nvarchar Direccion "NOT NULL"
+    }
+    Paseadores {
+        int Id PK, FK "-> Usuarios.Id"
+        nvarchar Zona "NOT NULL"
+        decimal TarifaPorHora "decimal(10,2)"
+    }
+    Perros {
+        int Id PK "IDENTITY"
+        int DuenoId FK "-> Duenos.Id"
+        nvarchar Nombre "NOT NULL"
+        nvarchar Raza "NOT NULL"
+        int Edad
+        datetime2 FechaAlta
+    }
+    Paseos {
+        int Id PK "IDENTITY"
+        int PaseadorId FK "-> Paseadores.Id"
+        int PerroId FK "-> Perros.Id"
+        datetime2 FechaHoraInicio
+        int DuracionMinutos
+        decimal PrecioTotal "decimal(10,2)"
+        datetime2 FechaAlta
+    }
+    Liquidaciones {
+        int Id PK "IDENTITY"
+        int PaseadorId FK "-> Paseadores.Id"
+        datetime2 FechaDesde
+        datetime2 FechaHasta
+        datetime2 FechaAlta
+    }
+    LiquidacionDetalles {
+        int Id PK "IDENTITY"
+        int LiquidacionId FK "-> Liquidaciones.Id"
+        int PaseoId FK, UK "-> Paseos.Id (indice unico)"
+        decimal Importe "decimal(10,2)"
+    }
+
+    Usuarios ||--o| Duenos : "TPT (cascade)"
+    Usuarios ||--o| Paseadores : "TPT (cascade)"
+    Duenos ||--o{ Perros : "tiene (restrict)"
+    Paseadores ||--o{ Paseos : "realiza (restrict)"
+    Perros ||--o{ Paseos : "sale en (restrict)"
+    Paseadores ||--o{ Liquidaciones : "cobra (restrict)"
+    Liquidaciones ||--|{ LiquidacionDetalles : "contiene (cascade)"
+    Paseos ||--o| LiquidacionDetalles : "se liquida (restrict)"
