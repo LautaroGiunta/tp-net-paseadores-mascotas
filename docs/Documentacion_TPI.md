@@ -13,7 +13,7 @@ lang: es-AR
 | **Comisión** | 3EK02 |
 | **Ciclo lectivo** | 2026 |
 | **Docentes** | Ezequiel Porta |
-| | Sebastian Rocco |
+| | Sebastián Rocco |
 | **Grupo** | 7 |
 | **Integrantes** | Dentesano Valentino (legajo 54915) — dentesanovalentino@gmail.com |
 | | Giunta Lautaro (legajo 54714) — lautogiunta@gmail.com |
