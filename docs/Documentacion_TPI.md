@@ -9,7 +9,7 @@ lang: es-AR
 | | |
 |---|---|
 | **Institución** | Universidad Tecnológica Nacional — Facultad Regional Rosario |
-| **Asignatura** | [COMPLETAR] |
+| **Asignatura** | Tecnologías de Desarrollo de Software IDE |
 | **Comisión** | 3EK02 |
 | **Docentes** | [COMPLETAR] |
 | **Grupo** | [COMPLETAR] |
@@ -139,21 +139,87 @@ opciones que el rol no puede usar.
 
 # 3. Capturas de pantalla
 
-[COMPLETAR: capturas tomadas con los tres roles.]
+Capturas tomadas con los datos de prueba, ingresando con cada uno de los tres roles: administrador (admin@paseos.com), dueño (ana.gomez@paseos.com) y paseador (carlos.ruiz@paseos.com).
 
 ## 3.1 Aplicación de escritorio
 
-[COMPLETAR: login, menú principal por rol, Dueños, Paseadores, Perros, Paseos (con filtros),
-Administradores y Liquidaciones.]
+El menú de la ventana principal muestra solo las opciones que el rol puede usar. Cada pantalla de ABMC tiene el formulario de carga a la izquierda y la grilla a la derecha; con doble clic en una fila se carga para modificarla.
+
+![Escritorio: inicio de sesión](capturas/esc-01-login.png)
+
+![Escritorio: menú Gestión del administrador](capturas/esc-menu-admin.png)
+
+![Escritorio: menú Reportes del administrador](capturas/esc-menu-admin-reportes.png)
+
+![Escritorio: menú del dueño (solo Perros y Paseos)](capturas/esc-menu-dueno.png)
+
+![Escritorio: menú del paseador (solo Paseos)](capturas/esc-menu-paseador.png)
+
+![Escritorio: ABMC de dueños](capturas/esc-duenos-admin.png)
+
+![Escritorio: ABMC de paseadores](capturas/esc-paseadores-admin.png)
+
+![Escritorio: ABMC de perros (administrador)](capturas/esc-perros-admin.png)
+
+![Escritorio: perros vistos por un dueño (solo los suyos, con el dueño fijo)](capturas/esc-perros-dueno.png)
+
+![Escritorio: ABMC de paseos (administrador)](capturas/esc-paseos-admin.png)
+
+![Escritorio: búsqueda de paseos filtrando por paseador y rango de fechas](capturas/esc-paseos-admin-filtro.png)
+
+![Escritorio: paseos vistos por un dueño (solo los de sus perros)](capturas/esc-paseos-dueno.png)
+
+![Escritorio: paseos vistos por un paseador (solo los suyos)](capturas/esc-paseos-paseador.png)
+
+![Escritorio: ABMC de administradores](capturas/esc-administradores-admin.png)
+
+![Escritorio: liquidaciones registradas (maestro)](capturas/esc-liquidaciones-lista.png)
+
+![Escritorio: edición de una liquidación (cabecera, paseos pendientes y detalle con el total)](capturas/esc-liquidaciones-detalle.png)
 
 ## 3.2 Aplicación web
 
-[COMPLETAR: login, menú por rol, Dueños, Paseadores, Perros, Paseos (con filtros),
-Administradores y Liquidaciones.]
+La barra lateral muestra solo las páginas que el rol puede usar; las páginas solo para el administrador redirigen al inicio si otro rol entra por URL.
+
+![Web: inicio de sesión](capturas/web-01-login.png)
+
+![Web: menú del administrador](capturas/web-inicio-admin.png)
+
+![Web: menú del dueño](capturas/web-inicio-dueno.png)
+
+![Web: menú del paseador](capturas/web-inicio-paseador.png)
+
+![Web: ABMC de dueños](capturas/web-duenos-admin.png)
+
+![Web: ABMC de paseadores](capturas/web-paseadores-admin.png)
+
+![Web: ABMC de perros (administrador)](capturas/web-perros-admin.png)
+
+![Web: perros vistos por un dueño](capturas/web-perros-dueno.png)
+
+![Web: ABMC de paseos (administrador)](capturas/web-paseos-admin.png)
+
+![Web: búsqueda de paseos filtrando por paseador y rango de fechas](capturas/web-paseos-admin-filtro.png)
+
+![Web: paseos vistos por un dueño](capturas/web-paseos-dueno.png)
+
+![Web: paseos vistos por un paseador](capturas/web-paseos-paseador.png)
+
+![Web: ABMC de administradores](capturas/web-administradores-admin.png)
+
+![Web: liquidaciones (maestro/detalle) editando una liquidación](capturas/web-liquidaciones-detalle.png)
 
 ## 3.3 Reportes
 
-[COMPLETAR: Recaudación mensual por paseador y Actividad por perro, en escritorio y en web.]
+Los dos reportes se consultan con ADO.NET y solo los ve el administrador. La recaudación mensual incluye un gráfico de barras (ScottPlot en escritorio, Chart.js en web).
+
+![Escritorio: reporte de recaudación mensual por paseador](capturas/esc-reporterecaudacion-admin.png)
+
+![Escritorio: reporte de actividad por perro](capturas/esc-reporteactividad-admin.png)
+
+![Web: reporte de recaudación mensual por paseador](capturas/web-reportes-recaudacion-admin.png)
+
+![Web: reporte de actividad por perro](capturas/web-reportes-actividad-admin.png)
 
 # 4. Modelo de datos
 
