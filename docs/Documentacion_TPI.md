@@ -11,8 +11,10 @@ lang: es-AR
 | **Institución** | Universidad Tecnológica Nacional — Facultad Regional Rosario |
 | **Asignatura** | Tecnologías de Desarrollo de Software IDE |
 | **Comisión** | 3EK02 |
-| **Docentes** | [COMPLETAR] |
-| **Grupo** | [COMPLETAR] |
+| **Ciclo lectivo** | 2026 |
+| **Docentes** | Ezequiel Porta |
+| | Sebastian Rocco |
+| **Grupo** | 7 |
 | **Integrantes** | Dentesano Valentino (legajo 54915) — dentesanovalentino@gmail.com |
 | | Giunta Lautaro (legajo 54714) — lautogiunta@gmail.com |
 | | Taborda Fausto (legajo 54914) — fausto.taborda05@gmail.com |
