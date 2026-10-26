@@ -8,6 +8,21 @@ Integrantes:
 Carpeta Compartida de Google Drive con informacion sobre el negocio y la arquitectura:  
 https://drive.google.com/drive/folders/1Go082EwDCfAqC32if1K6gshYj6In-kz1
 
+## Documentacion de la entrega final
+
+Todo esta en la carpeta `docs/`:
+
+| Ruta | Contenido |
+|------|-----------|
+| `docs/Documentacion_TPI.docx` | Documento de la entrega: caratula, descripcion, requerimientos, capturas, modelo de datos, modelo de clases, arquitectura implementada y tecnologias. |
+| `docs/Documentacion_TPI.md` | Fuente del documento (el `.docx` se genera a partir de este archivo). |
+| `docs/diagramas/` | Modelo de clases, modelo de datos y arquitectura, en Mermaid (`.mmd`) y como imagen (`.png`). |
+| `docs/capturas/` | Capturas de escritorio (`esc-*`) y web (`web-*`) con los tres roles, y de los reportes. |
+| `docs/originales/` | Documentos de agosto: informe preliminar y definicion de arquitectura (el chat con la IA). |
+
+El modelo de dominio preliminar quedo solo en el Drive: esta desactualizado y lo reemplaza el
+modelo de clases de `docs/diagramas/`.
+
 ## Usuarios de prueba
 
 La base de datos se crea sola al arrancar la WebAPI (Database.Migrate()) e incluye estos
