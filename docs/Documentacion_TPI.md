@@ -1,6 +1,6 @@
 ---
-title: "Sistema de Paseadores de Perros"
-subtitle: "Trabajo Práctico Integrador — Entrega final"
+Titulo: "Sistema de Paseadores de Perros"
+Subtitulo: "Trabajo Práctico Integrador — Entrega final"
 lang: es-AR
 ---
 
