@@ -129,16 +129,26 @@ Fuera de Development no se leen los user-secrets: ahi la clave va en la variable
 
 ### Permisos por rol
 
-| Operacion                           | Admin | Dueno | Paseador |
-|-------------------------------------|-------|-------|----------|
-| Consultar (GET) cualquier entidad   | si    | si    | si       |
-| Alta/baja/modificacion de Duenos    | si    | no    | no       |
-| Alta/baja/modificacion de Paseadores| si    | no    | no       |
-| Alta/baja/modificacion de Perros    | si    | si    | no       |
-| Alta/baja/modificacion de Paseos    | si    | si    | si       |
-| Administradores (todo, incluso GET) | si    | no    | no       |
-| Liquidaciones (todo, incluso GET)   | si    | no    | no       |
-| Reportes                            | si    | no    | no       |
+| Operacion                            | Admin | Dueno                        | Paseador            |
+|--------------------------------------|-------|------------------------------|---------------------|
+| Consultar duenos                     | todos | solo el mismo                | no                  |
+| Consultar perros                     | todos | solo los suyos               | todos, sin el dueno |
+| Consultar paseadores                 | todos | todos, sin email ni telefono | solo el mismo       |
+| Buscar paseadores por texto          | si    | no                           | no                  |
+| Consultar paseos                     | todos | los de sus perros            | los suyos           |
+| Alta/baja/modificacion de Duenos     | si    | no                           | no                  |
+| Alta/baja/modificacion de Paseadores | si    | no                           | no                  |
+| Alta/baja/modificacion de Perros     | si    | los suyos                    | no                  |
+| Alta/baja/modificacion de Paseos     | si    | los de sus perros            | los suyos           |
+| Administradores (todo, incluso GET)  | si    | no                           | no                  |
+| Liquidaciones (todo, incluso GET)    | si    | no                           | no                  |
+| Reportes                             | si    | no                           | no                  |
+
+Las consultas las filtra la API con el usuario del token: si un dueno o un paseador pide datos
+ajenos (por id o con otro filtro en `/paseos/buscar`), recibe solo lo suyo o un 403. Hay dos
+excepciones a proposito: el dueno ve la lista de paseadores, porque la necesita para elegir uno
+al pedir un paseo (pero sin email ni telefono), y el paseador ve la lista de perros, porque la
+necesita para registrar un paseo (pero sin el nombre del dueno).
 
 El menu de la pantalla principal de escritorio esconde lo mismo que la API bloquea.
 
@@ -168,8 +178,9 @@ que el escritorio, con el mismo token JWT (lo guarda en `localStorage`).
    `http://localhost:5297`. Los dos estan en `Cors:OrigenesPermitidos` del `appsettings.json` de la
    WebAPI; si Blazor corre en otro puerto, hay que agregarlo ahi.
 3. Entrar con alguno de los usuarios de prueba. El menu se recorta segun el rol igual que en
-   escritorio, y las paginas solo-Admin (administradores, liquidaciones y reportes) redirigen al
-   inicio si se entra por URL directa con otro rol.
+   escritorio, y las paginas solo-Admin (duenos, paseadores, administradores, liquidaciones y
+   reportes) redirigen al inicio si se entra por URL directa con otro rol. La de perros redirige
+   al paseador.
 
 Desde la terminal, en dos consolas (antes, cargar la clave de los tokens si todavia no se hizo;
 ver *Clave para firmar los tokens*):

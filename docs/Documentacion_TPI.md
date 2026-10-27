@@ -94,7 +94,11 @@ que el rol del usuario puede usar.
 
 | Operación | Admin | Dueño | Paseador |
 |---|:-:|:-:|:-:|
-| Consultar dueños, paseadores, perros y paseos | sí | sí | sí |
+| Consultar dueños | todos | solo él mismo | no |
+| Consultar perros | todos | solo los suyos | todos, sin el nombre del dueño |
+| Consultar paseadores | todos | todos, sin email ni teléfono | solo él mismo |
+| Buscar paseadores por texto | sí | no | no |
+| Consultar paseos | todos | los de sus perros | los suyos |
 | Alta, baja y modificación de dueños | sí | no | no |
 | Alta, baja y modificación de paseadores | sí | no | no |
 | Alta, baja y modificación de perros | sí | sí (los suyos) | no |
@@ -105,6 +109,12 @@ que el rol del usuario puede usar.
 
 La API rechaza con 401 los pedidos sin token y con 403 los que el rol no permite. Las pantallas esconden las
 opciones que el rol no puede usar.
+
+Las consultas también las filtra la API, con el usuario del token: si un dueño o un paseador pide datos
+ajenos (por id o con otro filtro en la búsqueda de paseos), recibe solo lo suyo o un 403. Hay dos
+excepciones a propósito. El dueño ve la lista de paseadores, porque la necesita para elegir uno al pedir un
+paseo, pero sin email ni teléfono. El paseador ve la lista de perros, porque la necesita para registrar un
+paseo, pero sin el nombre del dueño.
 
 # 2. Requerimientos
 
