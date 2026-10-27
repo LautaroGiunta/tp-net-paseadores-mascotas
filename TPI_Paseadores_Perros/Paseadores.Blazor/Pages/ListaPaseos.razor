@@ -317,7 +317,7 @@
             erroresValidacion.Add("La duración debe estar entre 15 y 480 minutos.");
         }
 
-        if (EsAlta && paseo.FechaHoraInicio < DateTime.Now)
+        if (paseo.FechaHoraInicio < DateTime.Now)
         {
             erroresValidacion.Add("No se puede agendar un paseo en una fecha y hora que ya pasó.");
         }
