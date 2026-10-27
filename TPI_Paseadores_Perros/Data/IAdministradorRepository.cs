@@ -9,6 +9,5 @@ namespace Data
         Task<Usuario?> GetAsync(int id);
         Task<IEnumerable<Usuario>> GetAllAsync();
         Task<bool> UpdateAsync(Usuario administrador);
-        Task<bool> EmailExistsAsync(string email, int? excludeId = null);
     }
 }

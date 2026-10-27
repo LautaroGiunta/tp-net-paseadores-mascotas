@@ -58,18 +58,6 @@ namespace Data
             return false;
         }
 
-        public async Task<bool> EmailExistsAsync(string email, int? excludeId = null)
-        {
-            var query = _context.Paseadores.AsQueryable();
-            query = query.Where(p => p.Email.ToLower() == email.ToLower());
-
-            if (excludeId.HasValue)
-            {
-                query = query.Where(p => p.Id != excludeId.Value);
-            }
-            return await query.AnyAsync();
-        }
-
         public async Task<IEnumerable<Paseador>> GetByCriteriaAsync(PaseadorCriteria criteria)
         {
             string searchTerm = criteria.Texto.ToLower();

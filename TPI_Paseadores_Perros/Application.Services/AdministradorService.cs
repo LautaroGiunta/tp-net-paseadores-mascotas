@@ -8,10 +8,13 @@ namespace Application.Services
     public class AdministradorService : IAdministradorService
     {
         private readonly IAdministradorRepository administradorRepository;
+        private readonly IUsuarioRepository usuarioRepository;
 
-        public AdministradorService(IAdministradorRepository administradorRepository)
+        public AdministradorService(IAdministradorRepository administradorRepository,
+                                    IUsuarioRepository usuarioRepository)
         {
             this.administradorRepository = administradorRepository;
+            this.usuarioRepository = usuarioRepository;
         }
 
         public async Task<UsuarioDTO> AddAsync(UsuarioDTO dto)
@@ -19,7 +22,7 @@ namespace Application.Services
             ValidarTelefono(dto.Telefono);
 
             // Regla de negocio: el email identifica al usuario en el login
-            if (await administradorRepository.EmailExistsAsync(dto.Email))
+            if (await usuarioRepository.EmailExistsAsync(dto.Email))
             {
                 throw new ArgumentException($"Ya existe un usuario con el email '{dto.Email}'.");
             }
@@ -68,7 +71,7 @@ namespace Application.Services
             ValidarTelefono(dto.Telefono);
 
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio usuario)
-            if (await administradorRepository.EmailExistsAsync(dto.Email, dto.Id))
+            if (await usuarioRepository.EmailExistsAsync(dto.Email, dto.Id))
             {
                 throw new ArgumentException($"Ya existe otro usuario con el email '{dto.Email}'.");
             }

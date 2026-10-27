@@ -9,11 +9,14 @@ namespace Application.Services
     {
         private readonly IPaseadorRepository paseadorRepository;
         private readonly IPaseoRepository paseoRepository;
+        private readonly IUsuarioRepository usuarioRepository;
 
-        public PaseadorService(IPaseadorRepository paseadorRepository, IPaseoRepository paseoRepository)
+        public PaseadorService(IPaseadorRepository paseadorRepository, IPaseoRepository paseoRepository,
+                               IUsuarioRepository usuarioRepository)
         {
             this.paseadorRepository = paseadorRepository;
             this.paseoRepository = paseoRepository;
+            this.usuarioRepository = usuarioRepository;
         }
 
         public async Task<PaseadorDTO> AddAsync(PaseadorDTO dto)
@@ -23,10 +26,10 @@ namespace Application.Services
             {
                 throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
             }
-            // Regla de negocio: el email no puede estar duplicado
-            if (await paseadorRepository.EmailExistsAsync(dto.Email))
+            // Regla de negocio: el email no puede estar duplicado en ningún tipo de usuario
+            if (await usuarioRepository.EmailExistsAsync(dto.Email))
             {
-                throw new ArgumentException($"Ya existe un paseador con el email '{dto.Email}'.");
+                throw new ArgumentException($"Ya existe un usuario con el email '{dto.Email}'.");
             }
             // Validar que la tarifa sea un valor lógico
             if (dto.TarifaPorHora <= 0)
@@ -81,9 +84,9 @@ namespace Application.Services
             }
 
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio paseador)
-            if (await paseadorRepository.EmailExistsAsync(dto.Email, dto.Id))
+            if (await usuarioRepository.EmailExistsAsync(dto.Email, dto.Id))
             {
-                throw new ArgumentException($"Ya existe otro paseador con el email '{dto.Email}'.");
+                throw new ArgumentException($"Ya existe otro usuario con el email '{dto.Email}'.");
             }
             // Validar que la tarifa sea un valor lógico
             if (dto.TarifaPorHora <= 0)

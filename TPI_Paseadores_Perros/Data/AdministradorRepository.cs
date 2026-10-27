@@ -60,18 +60,6 @@ namespace Data
             return false;
         }
 
-        // Se busca en todos los usuarios: el login es por email, no puede repetirse
-        // aunque el otro sea un dueño o un paseador
-        public async Task<bool> EmailExistsAsync(string email, int? excludeId = null)
-        {
-            var query = _context.Usuarios.Where(u => u.Email.ToLower() == email.ToLower());
-            if (excludeId.HasValue)
-            {
-                query = query.Where(u => u.Id != excludeId.Value);
-            }
-            return await query.AnyAsync();
-        }
-
         private IQueryable<Usuario> Administradores()
         {
             return _context.Usuarios.Where(u => u.Rol == RolUsuario.Admin);

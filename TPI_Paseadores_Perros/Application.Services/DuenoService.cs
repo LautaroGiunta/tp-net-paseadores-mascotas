@@ -9,11 +9,14 @@ namespace Application.Services
     {
         private readonly IDuenoRepository duenoRepository;
         private readonly IPerroRepository perroRepository;
+        private readonly IUsuarioRepository usuarioRepository;
 
-        public DuenoService(IDuenoRepository duenoRepository, IPerroRepository perroRepository)
+        public DuenoService(IDuenoRepository duenoRepository, IPerroRepository perroRepository,
+                            IUsuarioRepository usuarioRepository)
         {
             this.duenoRepository = duenoRepository;
             this.perroRepository = perroRepository;
+            this.usuarioRepository = usuarioRepository;
         }
 
         public async Task<DuenoDTO> AddAsync(DuenoDTO dto)
@@ -23,10 +26,10 @@ namespace Application.Services
             {
                 throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
             }
-            // Regla de negocio: el email no puede estar duplicado
-            if (await duenoRepository.EmailExistsAsync(dto.Email))
+            // Regla de negocio: el email no puede estar duplicado en ningún tipo de usuario
+            if (await usuarioRepository.EmailExistsAsync(dto.Email))
             {
-                throw new ArgumentException($"Ya existe un dueño con el email '{dto.Email}'.");
+                throw new ArgumentException($"Ya existe un usuario con el email '{dto.Email}'.");
             }
 
             Usuario.ValidarContrasena(dto.Contrasena);
@@ -76,9 +79,9 @@ namespace Application.Services
                 throw new ArgumentException("El formato del teléfono es inválido. Debe contener entre 8 y 15 números, sin espacios ni letras.");
             }
             // Regla de negocio: el email no puede estar duplicado (excluyendo el propio dueño)
-            if (await duenoRepository.EmailExistsAsync(dto.Email, dto.Id))
+            if (await usuarioRepository.EmailExistsAsync(dto.Email, dto.Id))
             {
-                throw new ArgumentException($"Ya existe otro dueño con el email '{dto.Email}'.");
+                throw new ArgumentException($"Ya existe otro usuario con el email '{dto.Email}'.");
             }
 
             // Recuperar el existente para preservar la FechaAlta
