@@ -1,19 +1,36 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs;
+using System.Security.Claims;
 
 namespace WebAPI
 {
     public static class PaseadorEndpoints
     {
+        // El dueño necesita la lista para elegir paseador, pero no los datos de contacto
+        private static void OcultarContacto(PaseadorDTO dto)
+        {
+            dto.Email = "";
+            dto.Telefono = "";
+        }
         public static void MapPaseadorEndpoints(this WebApplication app)
         {
-            app.MapGet("/paseadores/{id}", async (int id, IPaseadorService paseadorService) =>
+            app.MapGet("/paseadores/{id}", async (int id, ClaimsPrincipal usuario, IPaseadorService paseadorService) =>
             {
+                if (usuario.EsPaseador() && id != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés ver los datos de otro paseador.");
+                }
+
                 PaseadorDTO? dto = await paseadorService.GetAsync(id);
 
                 if (dto == null)
                 {
                     return Results.NotFound();
+                }
+
+                if (usuario.EsDueno())
+                {
+                    OcultarContacto(dto);
                 }
 
                 return Results.Ok(dto);
@@ -24,9 +41,28 @@ namespace WebAPI
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
-            app.MapGet("/paseadores", async (IPaseadorService paseadorService) =>
+            app.MapGet("/paseadores", async (ClaimsPrincipal usuario, IPaseadorService paseadorService) =>
             {
-                var dtos = await paseadorService.GetAllAsync();
+                // El paseador solo se ve a sí mismo
+                if (usuario.EsPaseador())
+                {
+                    PaseadorDTO? yo = await paseadorService.GetAsync(usuario.ObtenerId());
+
+                    var lista = new List<PaseadorDTO>();
+                    if (yo != null)
+                    {
+                        lista.Add(yo);
+                    }
+                    return Results.Ok(lista);
+                }
+
+                var dtos = (await paseadorService.GetAllAsync()).ToList();
+
+                if (usuario.EsDueno())
+                {
+                    dtos.ForEach(OcultarContacto);
+                }
+
                 return Results.Ok(dtos);
             })
             .WithName("GetAllPaseadores")
@@ -48,7 +84,7 @@ namespace WebAPI
                 }
             })
             .WithName("GetPaseadoresByCriteria")
-            .RequireAuthorization()
+            .RequireAuthorization(Politicas.SoloAdmin)
             .Produces<List<PaseadorDTO>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();

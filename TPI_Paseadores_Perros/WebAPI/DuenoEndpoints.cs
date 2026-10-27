@@ -1,5 +1,6 @@
-using Application.Services;
+﻿using Application.Services;
 using DTOs;
+using System.Security.Claims;
 
 namespace WebAPI
 {
@@ -7,8 +8,13 @@ namespace WebAPI
     {
         public static void MapDuenoEndpoints(this WebApplication app)
         {
-            app.MapGet("/duenos/{id}", async (int id, IDuenoService duenoService) =>
+            app.MapGet("/duenos/{id}", async (int id, ClaimsPrincipal usuario, IDuenoService duenoService) =>
             {
+                if (usuario.EsDueno() && id != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés ver los datos de otro dueño.");
+                }
+
                 DuenoDTO? dto = await duenoService.GetAsync(id);
 
                 if (dto == null)
@@ -19,18 +25,30 @@ namespace WebAPI
                 return Results.Ok(dto);
             })
             .WithName("GetDueno")
-            .RequireAuthorization()
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces<DuenoDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
-            app.MapGet("/duenos", async (IDuenoService duenoService) =>
+            app.MapGet("/duenos", async (ClaimsPrincipal usuario, IDuenoService duenoService) =>
             {
+                // El dueño solo se ve a sí mismo
+                if (usuario.EsDueno())
+                {
+                    DuenoDTO? yo = await duenoService.GetAsync(usuario.ObtenerId());
+                    var lista = new List<DuenoDTO>();
+                    if (yo != null)
+                    {
+                        lista.Add(yo);
+                    }
+                    return Results.Ok(lista);
+                }
+
                 var dtos = await duenoService.GetAllAsync();
                 return Results.Ok(dtos);
             })
             .WithName("GetAllDuenos")
-            .RequireAuthorization()
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces<List<DuenoDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 

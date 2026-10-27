@@ -1,4 +1,4 @@
-using Domain.Model;
+﻿using Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data
@@ -74,6 +74,8 @@ namespace Data
 
             if (criteria.FechaHasta.HasValue)
                 query = query.Where(p => p.FechaHoraInicio <= criteria.FechaHasta.Value);
+            if(criteria.DuenoId.HasValue)
+                query = query.Where(p => p.Perro!.DuenoId == criteria.DuenoId.Value);
 
             return await query
                 .OrderBy(p => p.FechaHoraInicio)

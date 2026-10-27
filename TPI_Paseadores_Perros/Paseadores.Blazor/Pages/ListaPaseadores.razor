@@ -5,6 +5,7 @@
 @inject PaseadorApiClient PaseadorApi
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject SesionService Sesion
 
 <div class="container mt-4">
     <h2>Paseadores</h2>
@@ -150,6 +151,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Sesion.CargarAsync();
+        if (!Sesion.EsAdmin)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
         await CargarAsync();
     }
 

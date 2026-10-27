@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Domain.Model;
 using DTOs;
 
@@ -98,7 +98,7 @@ namespace Application.Services
         public async Task<IEnumerable<PaseoDTO>> GetByCriteriaAsync(PaseoCriteriaDTO criteriaDTO)
         {
             var criteria = new PaseoCriteria(criteriaDTO.PaseadorId, criteriaDTO.PerroId,
-                                             criteriaDTO.FechaDesde, criteriaDTO.FechaHasta);
+                                             criteriaDTO.FechaDesde, criteriaDTO.FechaHasta, criteriaDTO.DuenoId);
             var paseos = await paseoRepository.GetByCriteriaAsync(criteria);
             return paseos.Select(MapToDTO).ToList();
         }

@@ -1,4 +1,4 @@
-namespace DTOs
+﻿namespace DTOs
 {
     public class PaseoCriteriaDTO
     {
@@ -6,5 +6,6 @@ namespace DTOs
         public int? PerroId { get; set; }
         public DateTime? FechaDesde { get; set; }
         public DateTime? FechaHasta { get; set; }
+        public int? DuenoId { get; set; }
     }
 }

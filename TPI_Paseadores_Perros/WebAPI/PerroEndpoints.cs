@@ -8,13 +8,24 @@ namespace WebAPI
     {
         public static void MapPerroEndpoints(this WebApplication app)
         {
-            app.MapGet("/perros/{id}", async (int id, IPerroService perroService) =>
+            app.MapGet("/perros/{id}", async (int id, ClaimsPrincipal usuario, IPerroService perroService) =>
             {
                 PerroDTO? dto = await perroService.GetAsync(id);
 
                 if (dto == null)
                 {
                     return Results.NotFound();
+                }
+
+                if (usuario.EsDueno() && dto.DuenoId != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés ver un perro de otro dueño.");
+                }
+
+                // El paseador ve el perro, pero no de quién es
+                if (usuario.EsPaseador())
+                {
+                    dto.DuenoNombre = "";
                 }
 
                 return Results.Ok(dto);
@@ -25,9 +36,21 @@ namespace WebAPI
             .Produces(StatusCodes.Status404NotFound)
             .WithOpenApi();
 
-            app.MapGet("/perros", async (IPerroService perroService) =>
+            app.MapGet("/perros", async (ClaimsPrincipal usuario, IPerroService perroService) =>
             {
-                var dtos = await perroService.GetAllAsync();
+                if (usuario.EsDueno())
+                {
+                    return Results.Ok(await perroService.GetByDuenoAsync(usuario.ObtenerId()));
+                }
+
+                var dtos = (await perroService.GetAllAsync()).ToList();
+
+                // El paseador necesita los perros para registrar paseos, pero no de quién son
+                if (usuario.EsPaseador())
+                {
+                    dtos.ForEach(p => p.DuenoNombre = "");
+                }
+
                 return Results.Ok(dtos);
             })
             .WithName("GetAllPerros")
@@ -35,13 +58,18 @@ namespace WebAPI
             .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 
-            app.MapGet("/duenos/{duenoId}/perros", async (int duenoId, IPerroService perroService) =>
+            app.MapGet("/duenos/{duenoId}/perros", async (int duenoId,ClaimsPrincipal usuario, IPerroService perroService) =>
             {
+                if (usuario.EsDueno() && duenoId != usuario.ObtenerId())
+                {
+                    return UsuarioActual.Prohibido("No podés ver los perros de otro dueño.");
+                }
+
                 var dtos = await perroService.GetByDuenoAsync(duenoId);
                 return Results.Ok(dtos);
             })
             .WithName("GetPerrosByDueno")
-            .RequireAuthorization()
+            .RequireAuthorization(Politicas.AdminODueno)
             .Produces<List<PerroDTO>>(StatusCodes.Status200OK)
             .WithOpenApi();
 

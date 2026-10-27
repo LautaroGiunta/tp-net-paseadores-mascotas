@@ -150,6 +150,11 @@
     protected override async Task OnInitializedAsync()
     {
         await Sesion.CargarAsync();
+        if (Sesion.EsPaseador)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
         perro = NuevoPerro();
         await CargarDuenosAsync();
         await CargarAsync();
