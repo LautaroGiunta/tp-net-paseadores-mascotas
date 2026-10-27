@@ -24,5 +24,17 @@ namespace Data
             return await _context.Usuarios
                                  .FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        // Se busca en todos los usuarios (administradores, dueños y paseadores):
+        // el login es por email, así que no puede repetirse entre tipos distintos
+        public async Task<bool> EmailExistsAsync(string email, int? excludeId = null)
+        {
+            var query = _context.Usuarios.Where(u => u.Email.ToLower() == email.ToLower());
+            if (excludeId.HasValue)
+            {
+                query = query.Where(u => u.Id != excludeId.Value);
+            }
+            return await query.AnyAsync();
+        }
     }
 }

@@ -9,6 +9,9 @@ namespace Domain.Model
 {
     public class Usuario
     {
+        // También lo usa PaseadoresContext para el largo de la columna Email
+        public const int LargoMaximoEmail = 256;
+
         public int Id { get; private set; }
         public string Nombre { get; private set; }
         public string Apellido { get; private set; }
@@ -59,6 +62,8 @@ namespace Domain.Model
         {
             if (!EsEmailValido(email))
                 throw new ArgumentException("El email no tiene un formato válido.", nameof(email));
+            if (email.Trim().Length > LargoMaximoEmail)
+                throw new ArgumentException($"El email no puede tener más de {LargoMaximoEmail} caracteres.", nameof(email));
             Email = email.Trim();
         }
         private static bool EsEmailValido(string email)

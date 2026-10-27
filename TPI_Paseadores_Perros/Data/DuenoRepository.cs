@@ -55,16 +55,5 @@ namespace Data
             }
             return false;
         }
-
-        public async Task<bool> EmailExistsAsync(string email, int? excludeId = null)
-        {
-            var query = _context.Duenos.AsQueryable(); 
-                query = query.Where(d => d.Email.ToLower() == email.ToLower());
-            if (excludeId.HasValue)
-            {
-                query = query.Where(d => d.Id != excludeId.Value);
-            }
-            return await query.AnyAsync();
-        }
     }
 }

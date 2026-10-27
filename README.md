@@ -103,8 +103,29 @@ Ese token hay que mandarlo en el encabezado `Authorization: Bearer <token>` en t
 demas llamadas. El unico endpoint abierto es el login; el resto responde 401 sin token y
 403 cuando el rol no alcanza.
 
-Los parametros del token (clave de firma, emisor, audiencia y duracion) estan en la
-seccion `Jwt` del `appsettings.json` de la WebAPI. El token dura 120 minutos.
+Los parametros del token (emisor, audiencia y duracion) estan en la seccion `Jwt` del
+`appsettings.json` de la WebAPI. El token dura 120 minutos.
+
+### Clave para firmar los tokens (una vez por maquina)
+
+La clave con la que la API firma los tokens no esta en el repositorio: en `appsettings.json`,
+`Jwt:ClaveSecreta` esta vacia y cada uno la carga en sus *user-secrets*, que se guardan fuera de
+la carpeta del proyecto. Sin la clave, o si tiene menos de 32 caracteres, la API no arranca y
+avisa que falta.
+
+Desde la carpeta `TPI_Paseadores_Perros`, en PowerShell (arma una clave al azar de 72 caracteres):
+
+```
+dotnet user-secrets set "Jwt:ClaveSecreta" "$(New-Guid)$(New-Guid)" --project WebAPI
+```
+
+Tambien se puede desde Visual Studio: clic derecho en WebAPI > *Administrar secretos de usuario*,
+y en el archivo que se abre poner `{ "Jwt": { "ClaveSecreta": "..." } }` con una clave propia de
+32 caracteres o mas. Cada maquina puede tener una clave distinta, porque el token lo firma y lo
+valida la misma API.
+
+Fuera de Development no se leen los user-secrets: ahi la clave va en la variable de entorno
+`Jwt__ClaveSecreta`.
 
 ### Permisos por rol
 
@@ -150,7 +171,8 @@ que el escritorio, con el mismo token JWT (lo guarda en `localStorage`).
    escritorio, y las paginas solo-Admin (administradores, liquidaciones y reportes) redirigen al
    inicio si se entra por URL directa con otro rol.
 
-Desde la terminal, en dos consolas:
+Desde la terminal, en dos consolas (antes, cargar la clave de los tokens si todavia no se hizo;
+ver *Clave para firmar los tokens*):
 
 ```
 dotnet run --project TPI_Paseadores_Perros/WebAPI --launch-profile https

@@ -44,6 +44,15 @@ builder.Services.AddSwaggerGen(options =>
 var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>()
     ?? throw new InvalidOperationException("Falta la seccion 'Jwt' en appsettings.json.");
 
+// La clave no está en el repositorio: se carga con user-secrets o con la variable de entorno
+// Jwt__ClaveSecreta (ver README). HS256 necesita al menos 32 bytes.
+if (Encoding.UTF8.GetByteCount(jwtConfig.ClaveSecreta) < 32)
+{
+    throw new InvalidOperationException(
+        "Falta la clave para firmar los tokens (Jwt:ClaveSecreta) o tiene menos de 32 caracteres. " +
+        "Cargarla con: dotnet user-secrets set \"Jwt:ClaveSecreta\" \"<clave>\" --project WebAPI");
+}
+
 builder.Services.AddSingleton(jwtConfig);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -9,6 +9,5 @@ namespace Data
         Task<Dueno?> GetAsync(int id);
         Task<IEnumerable<Dueno>> GetAllAsync();
         Task<bool> UpdateAsync(Dueno dueno);
-        Task<bool> EmailExistsAsync(string email, int? excludeId = null);
     }
 }

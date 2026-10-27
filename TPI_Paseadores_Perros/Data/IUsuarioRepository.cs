@@ -10,5 +10,6 @@ namespace Data
     public interface IUsuarioRepository
     {
         Task<Usuario?> GetByEmailAsync(string email);
+        Task<bool> EmailExistsAsync(string email, int? excludeId = null);
     }
 }

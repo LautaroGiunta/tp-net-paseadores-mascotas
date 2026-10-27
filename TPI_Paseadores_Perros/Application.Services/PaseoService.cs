@@ -22,11 +22,7 @@ namespace Application.Services
 
         public async Task<PaseoDTO> AddAsync(PaseoDTO dto)
         {
-            // Regla de negocio: no se puede agendar un paseo en el pasado
-            if (dto.FechaHoraInicio < DateTime.Now)
-            {
-                throw new ArgumentException("No se puede agendar un paseo en una fecha y hora que ya pasó.");
-            }
+            ValidarFechaFutura(dto.FechaHoraInicio);
 
             Paseador paseador = await ValidarPaseadorAsync(dto.PaseadorId);
             await ValidarPerroAsync(dto.PerroId);
@@ -74,6 +70,19 @@ namespace Application.Services
         public async Task<bool> UpdateAsync(PaseoDTO dto)
         {
             await ValidarNoLiquidadoAsync(dto.Id);
+
+            // Recuperar el existente para preservar la FechaAlta
+            var existing = await paseoRepository.GetAsync(dto.Id);
+            if (existing == null)
+                return false;
+
+            // Regla de negocio: un paseo que ya pasó no se modifica, se liquida tal como fue
+            if (existing.FechaHoraInicio < DateTime.Now)
+            {
+                throw new ArgumentException("El paseo ya pasó, no se puede modificar.");
+            }
+            ValidarFechaFutura(dto.FechaHoraInicio);
+
             Paseador paseador = await ValidarPaseadorAsync(dto.PaseadorId);
             await ValidarPerroAsync(dto.PerroId);
 
@@ -82,11 +91,6 @@ namespace Application.Services
             {
                 throw new ArgumentException("El paseador ya tiene otro paseo agendado en ese horario.");
             }
-
-            // Recuperar el existente para preservar la FechaAlta
-            var existing = await paseoRepository.GetAsync(dto.Id);
-            if (existing == null)
-                return false;
 
             decimal precioTotal = paseador.CalcularPrecio(dto.DuracionMinutos);
 
@@ -101,6 +105,15 @@ namespace Application.Services
                                              criteriaDTO.FechaDesde, criteriaDTO.FechaHasta, criteriaDTO.DuenoId);
             var paseos = await paseoRepository.GetByCriteriaAsync(criteria);
             return paseos.Select(MapToDTO).ToList();
+        }
+
+        // Regla de negocio: no se puede agendar un paseo en el pasado, ni en el alta ni al modificarlo
+        private static void ValidarFechaFutura(DateTime fechaHoraInicio)
+        {
+            if (fechaHoraInicio < DateTime.Now)
+            {
+                throw new ArgumentException("No se puede agendar un paseo en una fecha y hora que ya pasó.");
+            }
         }
 
         private async Task<Paseador> ValidarPaseadorAsync(int paseadorId)

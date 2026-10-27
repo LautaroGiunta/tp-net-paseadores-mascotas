@@ -47,7 +47,9 @@ que el rol del usuario puede usar.
 **Usuarios (administradores, dueños y paseadores)**
 
 - El email identifica al usuario en el login: no puede haber dos usuarios con el mismo email, y tiene que
-  tener formato válido.
+  tener formato válido y como máximo 256 caracteres. La regla vale entre los tres tipos (un dueño no puede
+  usar el email de un administrador ni de un paseador) y no distingue mayúsculas. La controla el servicio
+  y, además, la garantiza un índice único en la base.
 - Nombre, apellido, email y teléfono son obligatorios. El teléfono tiene que tener entre 8 y 15 dígitos,
   sin espacios ni letras.
 - La contraseña tiene que tener al menos 8 caracteres. Se guarda hasheada con BCrypt, nunca en texto plano,
@@ -66,7 +68,8 @@ que el rol del usuario puede usar.
 
 **Paseos**
 
-- No se puede agendar un paseo en una fecha y hora que ya pasó.
+- No se puede agendar un paseo en una fecha y hora que ya pasó, ni al darlo de alta ni al modificarlo.
+- Un paseo que ya pasó no se puede modificar, tampoco el administrador: se liquida tal como fue.
 - La duración va de 15 a 480 minutos.
 - Un paseador no puede tener dos paseos que se superpongan en el tiempo.
 - El precio se calcula como `tarifa por hora × duración / 60` (redondeado a 2 decimales) y queda fijo
@@ -135,7 +138,7 @@ opciones que el rol no puede usar.
 | RNF05 | **Seguridad**: autenticación con token JWT (120 minutos) y autorización por rol en cada endpoint. Contraseñas hasheadas con BCrypt. Consultas SQL parametrizadas (sin concatenar texto). |
 | RNF06 | **Validación**: las entidades del dominio validan sus datos y no pueden quedar en un estado inválido; las pantallas avisan antes de enviar y muestran los errores que devuelve la API. |
 | RNF07 | **Integridad**: claves foráneas con borrado restringido, salvo las líneas de una liquidación (en cascada con su cabecera). |
-| RNF08 | **Configuración**: la URL de la API se toma de `appsettings.json` en escritorio y en web; la clave JWT, la cadena de conexión y los orígenes CORS, del `appsettings.json` de la API. |
+| RNF08 | **Configuración**: la URL de la API se toma de `appsettings.json` en escritorio y en web; la cadena de conexión y los orígenes CORS, del `appsettings.json` de la API. La clave para firmar los tokens JWT no está en el repositorio: se carga con user-secrets en desarrollo o con la variable de entorno `Jwt__ClaveSecreta`, y sin ella la API no arranca. |
 | RNF09 | **Documentación de la API**: Swagger con soporte para probar con token. |
 | RNF10 | **Usabilidad**: interfaz en español, mensajes de error claros y gráfico de los reportes sin depender de internet (Chart.js incluido en el proyecto). |
 
@@ -238,7 +241,7 @@ clave foránea a `Usuarios.Id`. Los administradores no tienen datos extra, así 
 
 | Tabla | Contenido | Relaciones |
 |---|---|---|
-| Usuarios | Datos comunes: nombre, apellido, email, teléfono, contraseña (hash), rol y fecha de alta. | Base de la herencia. |
+| Usuarios | Datos comunes: nombre, apellido, email, teléfono, contraseña (hash), rol y fecha de alta. | Base de la herencia. `Email` es `nvarchar(256)` con índice único. |
 | Duenos | Dirección. | `Id` → `Usuarios.Id` (cascade). |
 | Paseadores | Zona y tarifa por hora. | `Id` → `Usuarios.Id` (cascade). |
 | Perros | Nombre, raza, edad y fecha de alta. | `DuenoId` → `Duenos.Id` (restrict). |
@@ -248,6 +251,11 @@ clave foránea a `Usuarios.Id`. Los administradores no tienen datos extra, así 
 
 Los importes (`TarifaPorHora`, `PrecioTotal`, `Importe`) son `decimal(10,2)`. La fecha de fin del paseo y
 el total de la liquidación no se guardan: se calculan.
+
+El índice único del email lo agrega la migración `EmailUnico`. Si una base anterior ya tenía emails
+repetidos, esa migración le deja el email al usuario de menor Id y a los demás les antepone
+`repetido{Id}.` (por ejemplo `repetido4.admin@paseos.com`), así pueden entrar y el administrador les
+carga un email nuevo desde el ABM.
 
 # 5. Modelo de clases
 

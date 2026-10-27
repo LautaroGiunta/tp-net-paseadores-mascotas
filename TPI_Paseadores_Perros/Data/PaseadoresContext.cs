@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -14,8 +15,27 @@ namespace Data
         internal const string HashAdmin123 = "$2a$11$awijDt6KCL2HjFegQYT9veuBOQs5e73wuIPuemlA93B.t9LVoQA3y";
         internal const string HashDueno123 = "$2a$11$myJNnok7ay2koW4KqjG4E..7zSv7OpNgX0EyC30h2.pi1KbnzlU1.";
         internal const string HashPaseo123 = "$2a$11$DoRb5PcZZGgn/IP3.TgII.6kK9/FGHsfnvQlCYElPSCmJcWfOOsoG";
+        private const string IndiceEmailUnico = "IX_Usuarios_Email";
+
         public PaseadoresContext(DbContextOptions<PaseadoresContext> options) : base(options)
         {
+        }
+
+        // Los servicios controlan el email antes de guardar, pero si dos altas llegan juntas
+        // las dos pueden pasar ese control. El índice frena la segunda y acá se traduce a
+        // ArgumentException, para que la API responda 400 como con las demás validaciones.
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException sql
+                                               && (sql.Number == 2601 || sql.Number == 2627)
+                                               && sql.Message.Contains(IndiceEmailUnico))
+            {
+                throw new ArgumentException("Ya existe un usuario con ese email.", ex);
+            }
         }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Paseador> Paseadores { get; set; }
@@ -32,6 +52,17 @@ namespace Data
 
             modelBuilder.Entity<Usuario>().ToTable("Usuarios");
             modelBuilder.Entity<Dueno>().ToTable("Duenos");
+
+            // El email identifica al usuario en el login: único entre administradores,
+            // dueños y paseadores. Con nvarchar(max) SQL Server no permite el índice.
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.Email)
+                .HasMaxLength(Usuario.LargoMaximoEmail);
+
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Email)
+                .IsUnique()
+                .HasDatabaseName(IndiceEmailUnico);
 
 
             modelBuilder.Entity<Paseador>()
