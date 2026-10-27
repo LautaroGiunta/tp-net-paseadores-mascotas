@@ -3,7 +3,7 @@ erDiagram
         int Id PK "IDENTITY"
         nvarchar Nombre "NOT NULL"
         nvarchar Apellido "NOT NULL"
-        nvarchar Email "NOT NULL"
+        nvarchar Email UK "NOT NULL, 256"
         nvarchar Telefono "NOT NULL"
         nvarchar Contrasena "NOT NULL, hash BCrypt"
         int Rol "0 Admin, 1 Dueno, 2 Paseador"

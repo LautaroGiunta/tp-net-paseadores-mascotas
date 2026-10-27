@@ -47,7 +47,9 @@ que el rol del usuario puede usar.
 **Usuarios (administradores, dueños y paseadores)**
 
 - El email identifica al usuario en el login: no puede haber dos usuarios con el mismo email, y tiene que
-  tener formato válido.
+  tener formato válido y como máximo 256 caracteres. La regla vale entre los tres tipos (un dueño no puede
+  usar el email de un administrador ni de un paseador) y no distingue mayúsculas. La controla el servicio
+  y, además, la garantiza un índice único en la base.
 - Nombre, apellido, email y teléfono son obligatorios. El teléfono tiene que tener entre 8 y 15 dígitos,
   sin espacios ni letras.
 - La contraseña tiene que tener al menos 8 caracteres. Se guarda hasheada con BCrypt, nunca en texto plano,
@@ -238,7 +240,7 @@ clave foránea a `Usuarios.Id`. Los administradores no tienen datos extra, así 
 
 | Tabla | Contenido | Relaciones |
 |---|---|---|
-| Usuarios | Datos comunes: nombre, apellido, email, teléfono, contraseña (hash), rol y fecha de alta. | Base de la herencia. |
+| Usuarios | Datos comunes: nombre, apellido, email, teléfono, contraseña (hash), rol y fecha de alta. | Base de la herencia. `Email` es `nvarchar(256)` con índice único. |
 | Duenos | Dirección. | `Id` → `Usuarios.Id` (cascade). |
 | Paseadores | Zona y tarifa por hora. | `Id` → `Usuarios.Id` (cascade). |
 | Perros | Nombre, raza, edad y fecha de alta. | `DuenoId` → `Duenos.Id` (restrict). |
@@ -248,6 +250,11 @@ clave foránea a `Usuarios.Id`. Los administradores no tienen datos extra, así 
 
 Los importes (`TarifaPorHora`, `PrecioTotal`, `Importe`) son `decimal(10,2)`. La fecha de fin del paseo y
 el total de la liquidación no se guardan: se calculan.
+
+El índice único del email lo agrega la migración `EmailUnico`. Si una base anterior ya tenía emails
+repetidos, esa migración le deja el email al usuario de menor Id y a los demás les antepone
+`repetido{Id}.` (por ejemplo `repetido4.admin@paseos.com`), así pueden entrar y el administrador les
+carga un email nuevo desde el ABM.
 
 # 5. Modelo de clases
 
