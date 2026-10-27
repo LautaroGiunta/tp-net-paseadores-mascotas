@@ -68,7 +68,8 @@ que el rol del usuario puede usar.
 
 **Paseos**
 
-- No se puede agendar un paseo en una fecha y hora que ya pasó.
+- No se puede agendar un paseo en una fecha y hora que ya pasó, ni al darlo de alta ni al modificarlo.
+- Un paseo que ya pasó no se puede modificar, tampoco el administrador: se liquida tal como fue.
 - La duración va de 15 a 480 minutos.
 - Un paseador no puede tener dos paseos que se superpongan en el tiempo.
 - El precio se calcula como `tarifa por hora × duración / 60` (redondeado a 2 decimales) y queda fijo
@@ -137,7 +138,7 @@ opciones que el rol no puede usar.
 | RNF05 | **Seguridad**: autenticación con token JWT (120 minutos) y autorización por rol en cada endpoint. Contraseñas hasheadas con BCrypt. Consultas SQL parametrizadas (sin concatenar texto). |
 | RNF06 | **Validación**: las entidades del dominio validan sus datos y no pueden quedar en un estado inválido; las pantallas avisan antes de enviar y muestran los errores que devuelve la API. |
 | RNF07 | **Integridad**: claves foráneas con borrado restringido, salvo las líneas de una liquidación (en cascada con su cabecera). |
-| RNF08 | **Configuración**: la URL de la API se toma de `appsettings.json` en escritorio y en web; la clave JWT, la cadena de conexión y los orígenes CORS, del `appsettings.json` de la API. |
+| RNF08 | **Configuración**: la URL de la API se toma de `appsettings.json` en escritorio y en web; la cadena de conexión y los orígenes CORS, del `appsettings.json` de la API. La clave para firmar los tokens JWT no está en el repositorio: se carga con user-secrets en desarrollo o con la variable de entorno `Jwt__ClaveSecreta`, y sin ella la API no arranca. |
 | RNF09 | **Documentación de la API**: Swagger con soporte para probar con token. |
 | RNF10 | **Usabilidad**: interfaz en español, mensajes de error claros y gráfico de los reportes sin depender de internet (Chart.js incluido en el proyecto). |
 
