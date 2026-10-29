@@ -15,6 +15,13 @@ builder.Services.AddDbContext<PaseadoresContext>(options =>
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 
+// Errores no controlados: respuesta ProblemDetails sin el stack trace
+builder.Services.AddProblemDetails();
+
+// Un JSON mal formado o un parámetro inválido devuelve 400 sin lanzar la excepción
+// (en Development, por defecto, se lanza y la respuesta trae el stack trace)
+builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
+
 // Swagger con el botón Authorize para pegar el token del login
 builder.Services.AddSwaggerGen(options =>
 {
@@ -140,6 +147,8 @@ using (var scope = app.Services.CreateScope())
 
 }
 // Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
