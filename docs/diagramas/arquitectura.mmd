@@ -22,7 +22,6 @@ flowchart TB
     API --> SVC
     SVC --> DATA
     DATA --> DOM
-    API -.-> DOM
     DATA -- "EF Core / SqlClient" --> DB
 
     WF -.-> DTO
