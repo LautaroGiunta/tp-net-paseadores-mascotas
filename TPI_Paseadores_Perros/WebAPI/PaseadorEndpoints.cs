@@ -72,21 +72,13 @@ namespace WebAPI
 
             app.MapGet("/paseadores/buscar", async (string texto, IPaseadorService paseadorService) =>
             {
-                try
-                {
-                    var criteria = new PaseadorCriteriaDTO { Texto = texto };
-                    var paseadores = await paseadorService.GetByCriteriaAsync(criteria);
-                    return Results.Ok(paseadores);
-                }
-                catch (Exception ex)
-                {
-                    return Results.BadRequest(new { error = ex.Message });
-                }
+                var criteria = new PaseadorCriteriaDTO { Texto = texto };
+                var paseadores = await paseadorService.GetByCriteriaAsync(criteria);
+                return Results.Ok(paseadores);
             })
             .WithName("GetPaseadoresByCriteria")
             .RequireAuthorization(Politicas.SoloAdmin)
             .Produces<List<PaseadorDTO>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
             .WithOpenApi();
 
             app.MapPost("/paseadores", async (PaseadorDTO dto, IPaseadorService paseadorService) =>
