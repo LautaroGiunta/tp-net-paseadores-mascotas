@@ -69,6 +69,8 @@
             dgvPaseadores.Margin = new Padding(3, 2, 3, 2);
             dgvPaseadores.Name = "dgvPaseadores";
             dgvPaseadores.ReadOnly = true;
+            dgvPaseadores.MultiSelect = false;
+            dgvPaseadores.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPaseadores.RowHeadersWidth = 51;
             dgvPaseadores.Size = new Size(387, 416);
             dgvPaseadores.TabIndex = 9;

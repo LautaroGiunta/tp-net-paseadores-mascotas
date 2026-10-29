@@ -131,7 +131,7 @@ namespace Paseadores.WinForms
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvAdministradores.CurrentRow == null)
+            if (dgvAdministradores.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, seleccioná un administrador de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -143,7 +143,7 @@ namespace Paseadores.WinForms
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvAdministradores.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvAdministradores.SelectedRows[0].Cells["colId"].Value);
                     await ApiClient.Administradores.DeleteAsync(idSeleccionado);
 
                     MessageBox.Show("Administrador eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

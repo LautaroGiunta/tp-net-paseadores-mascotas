@@ -189,6 +189,8 @@
             dgvDueños.Margin = new Padding(3, 2, 3, 2);
             dgvDueños.Name = "dgvDueños";
             dgvDueños.ReadOnly = true;
+            dgvDueños.MultiSelect = false;
+            dgvDueños.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvDueños.RowHeadersWidth = 51;
             dgvDueños.Size = new Size(391, 362);
             dgvDueños.TabIndex = 25;

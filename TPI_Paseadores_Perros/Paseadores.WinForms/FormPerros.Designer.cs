@@ -61,6 +61,8 @@ namespace Paseadores.WinForms
             dgvPerros.Margin = new Padding(3, 2, 3, 2);
             dgvPerros.Name = "dgvPerros";
             dgvPerros.ReadOnly = true;
+            dgvPerros.MultiSelect = false;
+            dgvPerros.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPerros.RowHeadersWidth = 51;
             dgvPerros.Size = new Size(388, 334);
             dgvPerros.TabIndex = 5;

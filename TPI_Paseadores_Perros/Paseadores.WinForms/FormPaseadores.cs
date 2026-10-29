@@ -123,7 +123,7 @@ namespace Paseadores.WinForms
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvPaseadores.CurrentRow == null)
+            if (dgvPaseadores.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, seleccioná un paseador de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -134,7 +134,7 @@ namespace Paseadores.WinForms
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvPaseadores.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvPaseadores.SelectedRows[0].Cells["colId"].Value);
                     await ApiClient.Paseadores.DeleteAsync(idSeleccionado);
 
                     MessageBox.Show("Paseador eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

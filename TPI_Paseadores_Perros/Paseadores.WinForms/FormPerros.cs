@@ -178,7 +178,7 @@ namespace Paseadores.WinForms
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvPerros.CurrentRow == null)
+            if (dgvPerros.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, seleccioná un perro de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -190,7 +190,7 @@ namespace Paseadores.WinForms
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvPerros.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvPerros.SelectedRows[0].Cells["colId"].Value);
                     await ApiClient.Perros.DeleteAsync(idSeleccionado);
 
                     MessageBox.Show("Perro eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

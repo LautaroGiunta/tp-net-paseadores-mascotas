@@ -316,7 +316,7 @@ namespace Paseadores.WinForms
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvLiquidaciones.CurrentRow == null)
+            if (dgvLiquidaciones.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, seleccioná una liquidación de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -330,7 +330,7 @@ namespace Paseadores.WinForms
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvLiquidaciones.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvLiquidaciones.SelectedRows[0].Cells["colId"].Value);
                     await ApiClient.Liquidaciones.DeleteAsync(idSeleccionado);
 
                     MessageBox.Show("Liquidación eliminada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

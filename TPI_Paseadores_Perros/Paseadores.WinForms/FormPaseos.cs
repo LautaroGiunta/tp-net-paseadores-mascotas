@@ -219,7 +219,7 @@ namespace Paseadores.WinForms
 
         private async void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (dgvPaseos.CurrentRow == null)
+            if (dgvPaseos.SelectedRows.Count == 0)
             {
                 MessageBox.Show("Por favor, seleccioná un paseo de la grilla primero.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -231,7 +231,7 @@ namespace Paseadores.WinForms
             {
                 try
                 {
-                    int idSeleccionado = Convert.ToInt32(dgvPaseos.CurrentRow.Cells["colId"].Value);
+                    int idSeleccionado = Convert.ToInt32(dgvPaseos.SelectedRows[0].Cells["colId"].Value);
                     await ApiClient.Paseos.DeleteAsync(idSeleccionado);
 
                     MessageBox.Show("Paseo eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);

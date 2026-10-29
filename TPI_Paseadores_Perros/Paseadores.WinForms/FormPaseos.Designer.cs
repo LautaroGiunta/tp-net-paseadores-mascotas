@@ -70,6 +70,8 @@ namespace Paseadores.WinForms
             dgvPaseos.Margin = new Padding(3, 2, 3, 2);
             dgvPaseos.Name = "dgvPaseos";
             dgvPaseos.ReadOnly = true;
+            dgvPaseos.MultiSelect = false;
+            dgvPaseos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPaseos.RowHeadersWidth = 51;
             dgvPaseos.Size = new Size(387, 242);
             dgvPaseos.TabIndex = 11;
