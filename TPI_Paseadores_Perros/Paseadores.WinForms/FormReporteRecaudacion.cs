@@ -10,6 +10,9 @@ namespace Paseadores.WinForms
         // Orden fijo de paseadores para que cada uno conserve su color entre filtros
         private List<PaseadorDTO> paseadores = new List<PaseadorDTO>();
 
+        // Panel de la leyenda del último gráfico, para no acumular uno por cada generación
+        private ScottPlot.IPanel? panelLeyenda;
+
         public FormReporteRecaudacion()
         {
             InitializeComponent();
@@ -145,8 +148,11 @@ namespace Paseadores.WinForms
             {
                 plot.Legend.ManualItems.Add(new ScottPlot.LegendItem { LabelText = serie.Nombre, FillColor = serie.Color });
             }
-            // Afuera del área de datos, así no tapa ninguna barra
-            plot.ShowLegend(ScottPlot.Edge.Right);
+            // Afuera del área de datos, así no tapa ninguna barra.
+            // ShowLegend agrega un panel nuevo cada vez: se saca el del gráfico anterior
+            if (panelLeyenda != null)
+                plot.Axes.Remove(panelLeyenda);
+            panelLeyenda = plot.ShowLegend(ScottPlot.Edge.Right);
 
             double[] posiciones = Enumerable.Range(0, meses.Count).Select(i => (double)i).ToArray();
             string[] etiquetas = meses.Select(m => NombreMes(m.Year, m.Month)).ToArray();
