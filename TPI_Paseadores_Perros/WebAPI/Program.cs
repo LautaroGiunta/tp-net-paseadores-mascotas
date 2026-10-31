@@ -17,10 +17,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Errores no controlados: respuesta ProblemDetails sin el stack trace
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ManejadorDeBadRequest>();
 
-// Un JSON mal formado o un parámetro inválido devuelve 400 sin lanzar la excepción
-// (en Development, por defecto, se lanza y la respuesta trae el stack trace)
-builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
+// Un JSON mal formado o un parámetro inválido lanza BadHttpRequestException
+// (también fuera de Development) para que ManejadorDeBadRequest devuelva el 400 con el motivo
+builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = true);
 
 // Swagger con el botón Authorize para pegar el token del login
 builder.Services.AddSwaggerGen(options =>
