@@ -97,6 +97,7 @@ namespace Paseadores.WinForms
                     p.Raza,
                     p.Edad
                 }).ToList();
+                dgvPerros.ClearSelection();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
             {

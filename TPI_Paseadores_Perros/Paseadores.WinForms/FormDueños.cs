@@ -33,6 +33,7 @@ namespace Paseadores.WinForms
             {
                 List<DuenoDTO> lista = await ApiClient.Duenos.GetAllAsync();
                 dgvDueños.DataSource = lista;
+                dgvDueños.ClearSelection();
 
             }
             catch (ApiException ex) when (ex.StatusCode == 401)

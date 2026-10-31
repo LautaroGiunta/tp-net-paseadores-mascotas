@@ -126,6 +126,7 @@ namespace Paseadores.WinForms
             {
                 paseosCargados = FiltrarSegunUsuario(await ApiClient.Paseos.GetAllAsync());
                 MostrarPaseos();
+                dgvPaseos.ClearSelection();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
             {

@@ -1,4 +1,4 @@
-using API.Clients;
+﻿using API.Clients;
 using DTOs;
 
 namespace Paseadores.WinForms
@@ -21,6 +21,7 @@ namespace Paseadores.WinForms
             dtpHasta.Value = DateTime.Today;
 
             await GenerarAsync();
+            dgvActividad.ClearSelection();
         }
 
         private async void btnGenerar_Click(object sender, EventArgs e)

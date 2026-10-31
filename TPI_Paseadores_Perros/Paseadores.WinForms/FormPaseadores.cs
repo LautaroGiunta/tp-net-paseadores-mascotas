@@ -34,6 +34,7 @@ namespace Paseadores.WinForms
             {
                 List<PaseadorDTO> lista = await ApiClient.Paseadores.GetAllAsync();
                 dgvPaseadores.DataSource = lista;
+                dgvPaseadores.ClearSelection();
             }
             catch (ApiException ex) when (ex.StatusCode == 401)
             {
